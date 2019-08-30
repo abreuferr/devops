@@ -1,0 +1,156 @@
+#: Title : Descomplicando o Kubernetes
+#: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
+#: Description : Descomplicando o Kubernetes - treinamento jeferson fernando noronha 
+#: Options : None
+
+#
+# TOPOLOGIA
+#
+# k0 - master - 192.168.10.50
+# k1 - no1 - 192.168.10.51
+# k2 - no2 - 192.168.10.52
+
+#
+# SWAP (todos os hosts do cluster)
+#
+$ sudo swapoff -a
+$ sudo vi /etc/fstab
+	comentar a linha referente ao swap
+
+##
+# INSTALACAO
+##
+
+# 
+# DOCKER (todos os hosts do cluster)
+#
+$ sudo apt-get install apt-transport-https ca-certificates curl gnupg2 software-properties-common -y -d
+$ curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
+$ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
+$ sudo apt-get update
+$ sudo apt-get install docker-ce -y -d
+
+#
+# KUBERNETES (todos os hosts do cluster)
+#
+$ curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+$ echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
+$ sudo apt-get update
+$ sudo apt-get install kubelet kubeadm kubectl -y -d
+
+#
+# INICIALIZACAO (master)
+#
+$ sudo kubeadm init
+$ mkdir -p $HOME/.kube
+$ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+$ sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+##
+# PODNETWORK
+##
+
+# CRIAR - WEAVE
+#
+$ sudo kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+
+# CRIAR - CALICO
+#
+$ sudo kubectl apply -f https://docs.projectcalico.org/v2.6/getting-started/kubernetes/installation/hosted/kubeadm/1.6/calico.yaml
+
+##
+# NODES
+##
+
+# ADICIONAR
+#
+$ sudo kubeadm join 192.168.10.50:6443 --token ffu2hd.iz683v47xmbuc0tc --discovery-token-ca-cert-hash sha256:092882b60b53b1381b71ba156292f30b5ab9c4636cc55327bb7731dcf5780304
+
+# comando utilizado para exibir a linha de comando
+# utilizada para adicionar um no no kubernetes.
+#
+$ sudo kubeadm token create --print-join-command
+
+# EXIBIR
+#
+$ sudo kubectl get nodes
+$ sudo kubectl get nodes -o wide
+
+# DESCRICAO
+#
+$ sudo kubectl describe [NODE_NAME]
+
+##
+# PODS
+##
+
+# EXIBIR
+#
+$ sudo kubectl get pods
+$ sudo kubectl get pods -o wide
+$ sudo kubectl get pods -o wide --all-namespaces
+$ sudo kubectl get pods -o wide -n [NAMESPACE_NAME]
+$ sudo kubectl get pods [POD_NAME] -o yaml
+
+# DESCRICAO
+#
+$ sudo kubectl describe pods [POD]
+$ sudo kubectl describe pods -n [NAMESPACE_NAME]
+
+##
+# NAMESPACES
+##
+
+# EXIBIR
+#
+$ sudo kubectl get namespaces
+$ sudo kubectl get pod --all-namespaces -o wide
+
+# DESCRICAO
+#
+$ sudo kubectl describe namespaces [NAMESPACE_NAME]
+
+##
+# DEPLOYMENT
+##
+
+# CRIACAO
+#
+$ sudo kubectl run [DEPLOYMENT_NAME] --image [IMAGEM_NAME]
+$ sudo kubectl create -f [FILE.YAML]
+
+# EXIBIR
+#
+$ sudo kubectl get deployment [DEPLOYMENT_NAME]
+$ sudo kubectl get deployment [DEPLOYMENT_NAME] -o yaml
+$ sudo kubectl get deployment [DEPLOYMENT_NAME] -o yaml >> [FILE.YAML]
+
+# DESCRICAO
+#
+$ sudo kubectl describe deployment [DEPLOYMENT_NAME]
+
+# EXPOSE
+#
+$ sudo kubectl expose deployment [DEPLOYMENT_NAME]
+
+# APAGAR
+#
+$ sudo kubectl delete deployment [DEPLOYMENT_NAME]
+$ sudo kubectl delete -f [FILE.YAML]
+
+##
+# SERVICE
+##
+
+# EXIBIR
+#
+$ sudo kubectl get service
+$ sudo kubectl get [SERVICE]
+
+##
+# ENDPOINT
+##
+
+# EXIBIR
+#
+$ sudo jubectl get endpoints

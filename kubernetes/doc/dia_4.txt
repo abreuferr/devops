@@ -1,0 +1,107 @@
+#: Title : Descomplicando o Kubernetes
+#: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
+#: Description : Descomplicando o Kubernetes - treinamento jeferson fernando noronha 
+#: Options : None
+
+# TOPOLOGIA
+#
+# k0 - master - 192.168.10.50
+# k1 - no1 - 192.168.10.51
+# k2 - no2 - 192.168.10.52
+
+##
+# SERVICES
+##
+
+# CRIACAO
+#
+$ sudo kubectl create -f [FILE.YAML]
+
+# EXIBIR
+#
+$ sudo kubectl get services
+
+##
+# SERVICES ACCOUNT
+##
+
+# EXIBIR
+#
+$ sudo kubectl get servicesaccount
+$ sudo kubectl get servicesaccount -n [NAMESPACE-NAME]
+
+##
+# DEPLOYMENT
+##
+
+# CRIACAO
+#
+$ sudo kubectl create -f [FILE.YAML]
+$ sudo kubectl create -f [FILE.YAML] -n [NAMESPACE-NAME]
+
+# EXIBIR
+#
+$ sudo kubectl get deployment
+$ sudo kubectl get deployment -n [NAMESPACE-NAME]
+
+##
+# ENDPOINTS
+##
+
+# CRIACAO
+#
+$ sudo kubectl create -f [FILE.YAML]
+
+# EXIBIR
+#
+$ sudo kubectl get endpoints
+
+##
+# NAMESPACE
+##
+
+# CRIACAO
+#
+$ sudo kubectl create namespace [NAMESPACE-NAME]
+
+# EXIBIR
+#
+$ sudo kubectl get namespaces
+
+##
+# CONFIG MAP
+##
+
+# CRIACAO
+#
+$ sudo kubectl create -f [FILE.YAML]
+$ sudo kubectl create -f [FILE.YAML] -n [NAMESPACE-NAME]
+
+# EXIBIR
+#
+$ sudo kubectl get configmaps
+$ sudo kubectl get configmaps -n [NAMESPACE-NAME]
+
+# DESCRICAO
+#
+$ sudo kubectl describe configmaps [CONFIGMAP-NAME]
+$ sudo kubectl describe configmaps [CONFIGMAP-NAME] -n [NAMESPACE-NAME]
+
+##
+# INGRESS
+##
+
+# CRIACAO
+#
+$ sudo kubectl create -f [FILE.YAML]
+$ sudo kubectl create -f [FILE.YAML] -n [NAMESPACE-NAME]
+
+# EXIBIR
+#
+$ sudo kubectl get ingresses.extensions
+$ sudo kubectl get ingresses.extensions -n [NAMESPACE-NAME]
+
+# DESCRICAO
+#
+$ sudo kubectl describe ingresses.extensions [INGRESS-NAME]
+$ sudo kubectl describe ingresses.extensions [INGRESS-NAME] -n [NAMESPACE-NAME]

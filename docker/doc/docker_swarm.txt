@@ -1,0 +1,78 @@
+#: Title : Docker Machine e Swarm
+#: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
+#: Description : Dcoker Machine e Swarm
+#: Options : distribuicao utilizada - gnu/linux debian
+
+###
+# DOCKER
+###
+
+# INSTALACAO
+#
+# o docker deve ser instalado em todos os hosts do cluster swam
+#
+$ sudo apt-get update
+$ sudo apt-get upgrade
+$ sudo apt-get install curl
+$ sudo curl -sSL https://get.docker.com/ | sh
+$ sudo usermod -aG docker [USUARIO]
+
+
+###
+# SWARM
+###
+
+$ docker swarm init --advertise-addr [MANAGER-IP] ; inicalizar o cluster swarm
+$ docker swarm join-token manager ; comando utilizado para exibir o comando utilizado para adicionar master no swarm
+$ docker swarm join-token worker ; comando utilizado para exibir o comando utilizado para adicionar worker no swarm
+$ docker swarm leave ; comando utilizado para remover o node do cluster swarm
+
+###
+# NODE
+###
+
+$ docker node ls ; listar o nodes do cluster
+$ docker node ps ; listar as tarefas que estao sendo executadas nos nodes
+$ docker node rm [NODE-NAME]; remover o host do cluster 
+$ docker node inspect [NODE-NAME] ; obter informacao sobre um determinado node do cluster swarm
+$ docker node update [NODE-NAME] ; atualizar as configuracoes do node
+$ docker node --role worker [NODE-NAME] ; torna o node um worker
+$ docker node --role manager [NODE-NAME] ; torna o node um manager
+$ docker node update --availability drain [NODE-NAME] ; desativar determinado node do cluster swarm
+$ docker node update --availability active [NODE-NAME] ; ativar determinado node do cluster swarm
+$ docker node update --availability pause [NODE-NAME] ; pausar determinado node do cluster swarm
+$ docker node promote [NODE_NAME] ; promover o host de worker para manager
+$ docker node demote [NODE_NAME] ; rebaixar o host de manager para worker
+
+##
+# SERVICO
+##
+
+$ docker service create [OPCAO]--replicas [REPLICA-NUMBER] --name [SERVICE-NAME] [IMAGE-NAME]:[VERSION] ; criacao de um servico
+$ docker service ls ; listar os servicos que estao ativos
+$ docker service ps [SERVICE-NAME] ; obter informacao sobre o servico
+$ docker service scale [SERVICE-NAME]=[REPLICA-NUMBER] ; replicar o servico para N nodes do cluster swarm
+$ docker service rm [SERVICE-NAME] ; apagar um determinado servico
+
+# SERVICO [REPLICATED] + VOLUME
+#
+$ docker volume create [VOLUME-NAME] ; criacao de um volume
+$ docker service create --name [SERVICE-NAME] --replicas [QTDADE-REPLICA] -p 8080:80 --mount type=volume,src=[VOLUME-NAME],dst=/[DIR-VOLUNE-NAME] [IMAGE-NAME]:[VERSION] ; criacao de um servico com um determinado servico
+$ docker service update --mount-add type=volume,src=[VOLUME-NAME],dst=[CONTAINER-DIR] [SERVICE-NAME] ; adicionar um volume a um servico
+
+# SERVICO + REDE
+#
+$ docker network create --driver overlay [NETWORK-NAME] ; criacao de uma rede do tipo overlay
+$ docker service create --name [SERVICE-NAME] --network [NETWORK-NAME] --replicas [QTDADE-REPLICA] [IMAGE-NAME]:[VERSION] ; criar e adicionar um servico em uma determinada rede
+$ docker service create --name [SERVICE-NAME] --network [NETWORK-NAME] -p 8080:80 --mode global [IMAGE-NAME]:[VERSION] ; servico do tipo globa implica que esse servico sera replicato para todos os nodes do cluster
+$ docker service create --name [SERVICE-NAME] --network-rm [NETWORK-NAME] --network-add [NETWORK-NAME] --replicas [QTDADE-REPLICA] [IMAGE-NAME]:[VERSION] ; criar e adicionar um servico em uma determinada rede e remover de outra rede
+
+# SERICE + IMAGEM
+#
+$ docker service update --image [IMAGE-NAME]:[VERSAO] [SERVICE-NAME] ; upgrade/downgrade de uma imagem em um servico
+
+# SERVICO + REDE + VOLUME
+#
+$ docker network create --driver overlay [NETWORK-NAME] ; criacao de uma rede do tipo overlay
+$ docker volume create [VOLUME-NAME]
+$ docker service create --name [SERICE-NAME] --network [NETWORK-NAME] --mount type=volume,src=[VOLUME-NAME],dst=/[CONTAINER-DIR] -p 8080:80 --replicas [QTDATE-REPLICA] --mode replicated --hostname [HOST-NAME] --dns [DNS] --limit-memory [QTDADE-MEMORY]M --limit-cpu 0.5 --restart-condition any [IMAGE-NAME]:[VERSION]

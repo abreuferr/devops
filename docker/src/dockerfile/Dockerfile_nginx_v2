@@ -1,0 +1,24 @@
+# docker build --no-cache -f [DOCKERFILE_NAME] -t [IMAGE_NAME]:[VERSAO] . ; contrucao da imagem
+
+# docker container run -d -p [PORTA_HOST]:[PORTA_CONTAINER] [IMAGE_NAME]:[VERSAO] ; execucao do containe
+
+# imagem - ultima versao estavel do debian
+FROM debian:latest
+
+# mantenedor da imagem
+MAINTAINER caio abreu ferreira - abreuferr@gmail.com
+
+# atualizacao e instalacao do nginx
+RUN apt-get update && apt-get upgrade -y && apt-get install -y nginx -y && apt-get clean
+
+# Variavel
+ENV PROJECT_DIR=/var/www/html/
+
+# copiar o arquivo index.html do host para a imagem
+COPY html/index.html $PROJECT_DIR
+
+# expor a porta 80 do container
+EXPOSE 80
+
+# inicializar o nginx no container
+CMD ["nginx", "-g", "daemon off;"]

@@ -1,0 +1,21 @@
+#: Title : volume
+#: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
+#: Description : volume
+#: Options : distribuicao utilizada - gnu/linux debian
+
+# VOLUME
+#
+$ docker volume create [HOST_VOLUME_NAME] ; criar um volume local
+$ docker volume ls ; listar os volumes
+$ docker volume rm [HOST_VOLUME_NAME] ; apagar um volume
+$ docker volume rm -f [HOST_VOLUME_NAME] ; forcar a remocao do volume
+
+# ASSOCIAR VOLUME_NAME/CONTAINER_DIR_NAME
+#
+$ docker container run -ti --mount type=volume,src=[VOLUME_NAME],dst=/[CONTAINER_DIR_NAME] --name [CONTAINER_NAME] [IMAGE_NAME]
+
+# ASSOCIAR HOST_DIR_NAME/DOCKER_DIR_NAME
+#
+$ docker container run -ti --mount type=bind,src=[HOST_VOLUME_NAME],dst=/[CONTAINER_DIR_NAME] --name [CONTAINER_NAME] [IMAGE_NAME] ; 
+$ docker container run -ti --mount type=bind,src=[HOST_VOLUME_NAME],dst=/[CONTAINER_DIR_NAME],rw --name [CONTAINER_NAME] [IMAGE_NAME] ; ro
+$ docker container run -ti --mount type=bind,src=[HOST_VOLUME_NAME],dst=/[CONTAINER_DIR_NAME],ro --name [CONTAINER_NAME] [IMAGE_NAME] ; rw

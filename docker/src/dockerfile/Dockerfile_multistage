@@ -1,0 +1,12 @@
+# $ docker image build --no-cache -f Dockerfile_multistage -t abreuferr/goapp:1.0 .
+# $ docker container run -ti abreuferr/goapp:1.0
+
+FROM golang AS build
+WORKDIR /src
+ADD multistage/goapp.go /src
+RUN go build -o goapp
+
+FROM alpine:3.1
+WORKDIR /app
+COPY --from=build /src/goapp /app
+ENTRYPOINT ./goapp

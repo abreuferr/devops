@@ -1,0 +1,200 @@
+#: Title : MySQL
+#: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
+#: Description : Docker e MySQL
+#: Options :
+#: Reference :	http://severalnines.com/blog/mysql-docker-building-container-image
+								http://severalnines.com/blog/mysql-docker-containers-understanding-basics
+								http://severalnines.com/blog/mysql-docker-single-host-networking-mysql-containers
+
+1. MYSQL BASICO
+# Nesse exemplo, sera criado um container MySQL baseado na imagem oficial do MySQL,
+# Docker Hub. Logo em seguida, sera instalado MySQL client no host para demonstrar
+# a conexao entre o host(MySQL Client) e container MYSQL_Server.
+
+# download da ultima versao da imagem do mysql
+#
+$ docker image pull mysql
+
+# criacao e inicializacao do docker do mysql
+#
+$ docker container run --detach --name=mysql_server --env="MYSQL_ROOT_PASSWORD=mypassword" mysql
+
+# verificar qual eh o endereco IP do container
+#
+$ docker container inspect mysql_server
+	"IPAddress": "172.17.0.2"
+
+# o objetivo desta etapa eh do instalar o mysql client no host para simular um acesso
+# o mysql que esta no container.
+#
+# instalacao do client MySQL no host GNU/Linux Debian
+#
+$ sudo apt-get install mysql-client -y
+
+# acessando o servidor docker MySQL a partir do host GNU/Linux Debian
+#
+$ mysql -uroot -pmypassword -h 172.17.0.2 -P 3306
+	Welcome to the MySQL monitor.  Commands end with ; or \g.
+	Your MySQL connection id is 2
+	Server version: 5.7.15 MySQL Community Server (GPL)
+
+	Copyright (c) 2000, 2016, Oracle and/or its affiliates. All rights reserved.
+
+	Oracle is a registered trademark of Oracle Corporation and/or its
+	affiliates. Other names may be trademarks of their respective
+	owners.
+
+	Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+	mysql>
+
+2. PUBLICANDO PORTA
+# o parametro "--publish 3303:3306" permite associar a porta 3306 do host a porta
+# 3306 do container. desta forma, qualquer estacao da rede pode apontar para a
+# porta 3306 do host e ter o acesso ao servidor MySQL localizado em um container.
+$
+$ docker container run --detach --name=test-mysql --env="MYSQL_ROOT_PASSWORD=mypassword" --publish 3306:3306 mysql
+
+3. CONFIGURACAO DO MYSQL
+# O objetivo deste teste eh o de "copiar" o arquivo de configuracao do MySQL,
+# my.cnf, que esta localizado no host e para o MySQL localizado no container.
+
+# criar o diretorio com o arquivo de configuracao do MySQL.
+#
+$ mkdir -p Docker/mysql_server/conf.d
+
+# arquivo de configuracao
+#
+$ vi Docker/mysql_server/conf.d/my-custom.cnf
+	[mysqld]
+	max_connections=200
+
+# criando o container com as novas configuracoes
+#
+$ docker container run --detach --name=mysql_server --env="MYSQL_ROOT_PASSWORD=mypassword" --publish 3306:3306 --volume=/home/cosmo/Docker/mysql_server/conf.d:/etc/mysql/conf.d mysql
+
+# verificando a alteracao
+$ mysql -uroot -pmypassword -h127.0.0.1 -P3306 -e 'show global variables like "max_connections"';
+	+-----------------+-------+
+	| Variable_name   | Value |
+	+-----------------+-------+
+	| max_connections | 200   |
+	+-----------------+-------+
+
+4. VOLUME E BASE DE DADOS
+#
+# Com esse teste, sera possivel armazenar os dados do MySQL não dentro do container, mas no host
+# host - /home/cosmo/Docker/mysql_datadir
+# container - /var/lib/mysql
+
+# criacao do diretorio a onde os dados serao armazenados
+#
+$ mkdir -p /home/cosmo/Docker/mysql_datadir
+
+# criacao do container
+#
+$ docker container run --detach --name=mysql_server --env="MYSQL_ROOT_PASSWORD=mypassword" --publish 3303:3306 --volume=/home/cosmo/Docker/mysql_datadir:/var/lib/mysql mysql
+
+# informacao
+#
+$ docker container inspect mysql_server
+        "Mounts": [
+            {
+                "Source": "/home/cosmo/Docker/mysql_datadir",
+                "Destination": "/var/lib/mysql",
+                "Mode": "",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ],
+
+$ ls -la /home/cosmo/Docker/mysql_datadir/
+	total 188452
+	drwxr-xr-x 5   999 docker     4096 Sep 30 16:52 .
+	drwxr-xr-x 6 cosmo cosmo      4096 Sep 30 16:47 ..
+	-rw-r----- 1   999 docker       56 Sep 30 16:52 auto.cnf
+	-rw-r----- 1   999 docker     1329 Sep 30 16:52 ib_buffer_pool
+	-rw-r----- 1   999 docker 79691776 Sep 30 16:52 ibdata1
+	-rw-r----- 1   999 docker 50331648 Sep 30 16:52 ib_logfile0
+	-rw-r----- 1   999 docker 50331648 Sep 30 16:52 ib_logfile1
+	-rw-r----- 1   999 docker 12582912 Sep 30 16:52 ibtmp1
+	drwxr-x--- 2   999 docker     4096 Sep 30 16:52 mysql
+	drwxr-x--- 2   999 docker     4096 Sep 30 16:52 performance_schema
+	drwxr-x--- 2   999 docker    12288 Sep 30 16:52 sys
+
+# mesmo parando o container, os dados do MySQL nao serao removidos
+#
+$ docker contaienr stop mysql_server
+$ ls -la /home/cosmo/Docker/mysql_datadir/
+	total 176164
+	drwxr-xr-x 5   999 docker     4096 Sep 30 16:57 .
+	drwxr-xr-x 6 cosmo cosmo      4096 Sep 30 16:47 ..
+	-rw-r----- 1   999 docker       56 Sep 30 16:52 auto.cnf
+	-rw-r----- 1   999 docker      680 Sep 30 16:57 ib_buffer_pool
+	-rw-r----- 1   999 docker 79691776 Sep 30 16:57 ibdata1
+	-rw-r----- 1   999 docker 50331648 Sep 30 16:57 ib_logfile0
+	-rw-r----- 1   999 docker 50331648 Sep 30 16:52 ib_logfile1
+	drwxr-x--- 2   999 docker     4096 Sep 30 16:52 mysql
+	drwxr-x--- 2   999 docker     4096 Sep 30 16:52 performance_schema
+	drwxr-x--- 2   999 docker    12288 Sep 30 16:52 sys
+
+# se por acaso for criado um outro contaier apontando para o mesmo diretorio de
+# dados, o mesmo apresenta uma mensagem de erro.
+#
+$ docker container run --detach --name=new_mysql_server --env="MYSQL_ROOT_PASSWORD=mypassword" --publish 6603:3306 --volume=/home/cosmo/Docker/mysql_server/conf.d:/etc/mysql/conf.d --volume=/home/cosmo/Docker/mysql_datadir:/var/lib/mysql mysql
+$ docker container logs new_mysql_server
+	2016-09-30T20:01:21.222499Z 0 [ERROR] InnoDB: Unable to lock ./ibdata1 error: 11
+	2016-09-30T20:01:21.222530Z 0 [Note] InnoDB: Check that you do not already have another mysqld process using the same InnoDB data or log files.
+	(...)
+
+5. REDE
+5.1. HOST
+# quando software docker eh instalado, sao criados tres interfaces de rede que
+# serao utilizados pelo software
+$
+$ docker network ls
+	NETWORK ID          NAME                DRIVER              SCOPE
+	70921a3975c3        bridge              bridge              local
+	2205215f3de1        host                host                local
+	f9600453db5f        none                null                local
+
+# inicializacao do primeiro container utilizando a interface host
+#
+$ docker container run --name=mysql-host --net=host -e MYSQL_ROOT_PASSWORD=mypassword -v /storage/mysql-host/datadir:/var/lib/mysql -d mysql
+
+# exibindo informacoes sobre a porta de acesso do mysql
+#
+$ docker exec -it mysql-host /bin/bash
+	root@docker:/# apt-get update
+	root@docker:/# apt-get install net-tools
+	root@docker:/# netstat -tulpn | grep 3306
+	tcp6       0      0 :::3306                 :::*                    LISTEN      -
+
+5.2. BRIDGE (DEFAULT)
+# atraves do parametro "-p 3307:3306" eh possivel mapear a porta 3307 do host com
+# a porta 3306 do container. desta forma, eh possivel acessar o MySQL que esta
+# localizado no container atraves da porta 3307 do host
+#
+$ docker container run --name=mysql-bridge -p 3307:3306 -e MYSQL_ROOT_PASSWORD=mypassword -v /storage/mysql-bridge/datadir:/var/lib/mysql -d mysql
+
+# checando a porta 3307 no host
+#
+$ netstat -tulpn | grep 3307
+	(Not all processes could be identified, non-owned process info
+	will not be shown, you would have to be root to see it all.)
+	tcp6       0      0 :::3307                 :::*                    LISTEN      -
+
+5.3. BRIDGE (USER DEFINED)
+# criacao da rede "mysql-network"
+#
+$ docker network create mysql-network
+
+# informacao sobre a rede "mysql-network"
+#
+$ docker network ls
+	NETWORK ID          NAME                DRIVER              SCOPE
+	e853d3d009b9        mysql-network       bridge              local
+
+# criacao de um container com o mysql atrelado a rede "mysql-network"
+#
+$ docker network run --name=mysql_network --net=mysql-network -e MYSQL_ROOT_PASSWORD=mypassword -d mysql

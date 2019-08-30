@@ -1,0 +1,111 @@
+#: Title : Descomplicando o Kubernetes
+#: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
+#: Description : Descomplicando o Kubernetes - treinamento jeferson fernando noronha 
+#: Options : None
+
+# TOPOLOGIA
+#
+# k0 - master - 192.168.10.50
+# k1 - no1 - 192.168.10.51
+# k2 - no2 - 192.168.10.52
+
+##
+# SERVICE
+##
+
+# CRIACAO
+#
+$ sudo kubectl create -f [FILE.YAML]
+
+# EXIBIR
+#
+$ sudo kubectl get service
+
+# DESCRICAO
+#
+$ sudo kubectl describe service [SERVICE_NAME]
+
+# APAGAR
+#
+$ sudo kubectl delete service [SERVICE_NAME]
+$ sudo kubectl delete -f [FILE.YAML]
+
+##
+# ENDPOINT
+##
+
+# DESCRICAO
+#
+$ sudo kubectl describe [SERVICE_NAME]
+$ sudo kubectl describe [SERVICE_NAME] -o yaml
+
+##
+# CONTAINER
+##
+
+# ACESSAR O CONTAINET
+#
+$ sudo kubectl exec -ti [POD_NAME] -- /bin/bash
+
+##
+# NAMESPACES
+##
+
+# CRIACAO
+#
+$ sudo kubectl create namespace [NAMESPACE_NAME]
+$ sudo kubectl create -f [FILE.YAML] -n [NAMESPACE_NAME]
+
+# DESCRICAO
+#
+$ sudo kubectl describe namespace [NAMESPACE_NAME]
+$ sudo kubectl describe limitranges [NAMESPACE_NAME] -n [NAMESPACE_NAME]
+
+# EXIBIR
+#
+$ sudo kubectl get limitranges -n [NAMESPACE_NAME]
+$ sudo kubectl get --all-namespaces
+
+##
+# POD
+##
+
+# CRIACAO
+#
+$ sudo kubectl create -f [FILE.YAML] -n [NAMESPACE_NAME]
+
+# EXIBIR
+#
+$ sudo kubectl get pods -o wide
+$ sudo kubectl get pods -o wide -n [NAMESPACE_NAME]
+
+# DESCRICAO
+#
+$ sudo kubectl describe pod [POD_NAME] -n [NAMESPACE_NAME]
+
+# APAGAR
+#
+$ kubectl delete pod [POD_NAME]
+$ kubectl delete pod [POD_NAME] -n [NAMESPACE_NAME]
+
+##
+# TAINT (MANUTENCAO)
+##
+
+# DESCRICAO
+#
+$ kubectl describe nodes [NODE_NAME]
+
+# ADICIONAR
+#
+$ sudo kubectl taint node [NODE_NAME] key1=value:NoSchedule
+$ sudo kubectl taint node --all key1=value:NoSchedule
+
+# REMOVER
+#
+$ sudo kubectl taint node [NODE_NAME] key1:NoSchedule-
+
+# MATAR
+#
+$ sudo kubectl taint node [NODE_NAME] key1=value:NoExecute
+$ sudo kubectl taint node --all key1=value:NoExecute

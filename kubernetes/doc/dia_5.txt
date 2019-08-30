@@ -1,0 +1,108 @@
+#: Title : Descomplicando o Kubernetes
+#: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
+#: Description : Descomplicando o Kubernetes - treinamento jeferson fernando noronha 
+#: Options : None
+
+# TOPOLOGIA
+#
+# k0 - master - 192.168.10.50 ; node master
+# k1 - no1 - 192.168.10.51 ; node1
+# k2 - no2 - 192.168.10.52 ; node2
+# k3 - no3 - 192.168.10.53 ; nfs server
+
+##
+# POD
+##
+
+# CRIACAO
+#
+$ sudo kubectl create -f [FILE.YAML]
+
+# ACESSAR
+#
+$ sudo kubectl exec -ti [POD-NAME] -c [CONTAINER-NAME] -- /bin/sh
+
+##
+# NFS - k3
+##
+
+# SERVIDOR NFS
+#
+$ sudo apt-get install nfs-kernel-server -y -d
+
+$ sudo cat /etc/export
+	/mnt/nfs *(rw,sync,no_root_squash,subtree_check)
+$ sudo mkdir -p /mnt/nfs
+$ sudo chmod 1777 /mnt/nfs/
+$ sudo exportfs -ar
+
+# NODES DO CLUSTER
+#
+$ sudo apt-get install nfs-common -y -d
+
+
+##
+# PERSISTENT VOLUME
+##
+
+# CRIACAO
+#
+$ sudo kubectl create -f [FILE.YAML]
+
+# DESCRICAO
+#
+$ sudo kubectl describe persistentvolume [PV-NAME]
+
+# EXIBIR
+#
+$ sudo kubectl get persistentvolume [PV-NAME]
+
+##
+# PERSISTENT VOLUME CLAIM
+##
+
+# CRIACAO
+#
+$ sudo kubectl create -f [FILE.YAML]
+
+# DESCRICAO
+#
+$ sudo kubectl describe persistentvolumeclaims [PVC-NAME]
+
+##
+# CRON
+##
+
+# CRIACAO
+#
+$ sudo kubectl create -f [FILE.YAML]
+
+# EXIBIR
+#
+$ sudo kubectl get cronjobs.batch
+$ sudo kubectl get cronjobs.batch [CRON-NAME]
+
+# DESCRICAO
+#
+$ sudo kubectl describe cronjobs.batch
+$ sudo kubectl describe cronjobs.batch [CRON-NAME]
+
+##
+# SECRET
+##
+
+# CRIACAO
+#
+$ sudo kubectl create -f [FILE.YAML]
+$ sudo kubectl create secret generic meu-literal --from-literal user=tosko --from-literal password=catota
+
+# EXIBIR
+#
+$ sudo kubectl get secrets
+$ sudo kubectl get secrets [CRON-NAME]
+
+# SHOW ENV
+#
+$ sudo kubectl exec -ti busybox-secret-env -- printenv
+
+

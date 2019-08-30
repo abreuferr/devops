@@ -1,0 +1,61 @@
+#: Title : rede
+#: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
+#: Description : uma visao sobre rede no mundo docker
+#: Options :
+
+# docker network [COMANDO]
+
+  connect     Connect a container to a network
+  create      Create a network
+  disconnect  Disconnect a container from a network
+  inspect     Display detailed information on one or more networks
+  ls          List networks
+  prune       Remove all unused networks
+  rm          Remove one or more networks
+
+
+# BRIDGE (DEFAULT)
+#
+# standalone container
+#
+# mas quando eh criado uma rede e os containers sao inseridos nessa rede, entao eles passam a se enxergar.
+#
+$ docker network ls ; exibir as redes existentes
+$ docker network create -d bridge [NETWORK-NAME] ; criacao de uma rede do tipo bridge
+$ docker network inspect [NETWORK-NAME] ; obter informacoes das rede
+$ docker container [OPCAO] --name [CONTAINER-NAME] --network [NETWORK-NAME] [IMAGE-NAME] ; criar um container e adicionar o mesmo em uma rede
+$ docker network rm [NETWORK-NAME] ; apagar a rede criada
+
+# HOST
+#
+# nesse tipo de rede, eh removido o isolamento em termos de rede entre o container e o Docker host
+#
+$ docker container run [OPCAO] --network host --name [CONTAINER-NAME] [IMAGEM-NAME]
+
+# OVERLAY
+#
+# rede utilizada pelo Swarm
+#
+$ docker network create --drive=overlay [NETWORK-NAME] ; criar de uma do tipo overlay
+
+(...) ; criacao de um cluster swarm
+
+$ docker service create --name [SERVICE-NAME] --replicas=[REPLICA-NUMBER] --networki=[NETWORK-NAME] [IMAGE-NAME] ; criar um servico e adicionar esse servico em uma determinada rede
+$ docker container run [OPCAO] --network=[NETWORK-NAME] [IMAGE-NAME]:[VERSAO] ; criar um container e anexar esse container em uma determinada rede
+$ docker service update --network-add [NEW-NETWORK-NAME] --network-rm [OLD-NETWORK-NAME] [CONTAINER-NAME] ; mover um container de uma rede para outra
+$ docker network rm [NETWORK-NAME]
+
+# MACVLAN
+#
+# assinar um endereco MAC ao container
+# 
+$ docker network create -d macvlan --subnet=[NETWORK/CIDR] --gateway=[GATEWAY-IP] -o parent=[HOST-NETWORK-INTERFACE] [NETWORK-NAME] ; criar um rede do tipo overlay, definindo a subnet, endereco do gateway e interface de rede 
+
+$ docker container run [OPCAO] --network [NETWORK-NAME] --name [CONTAINER-NAME] [IMAGE-NAME]:[VERSAO] ; criar um container e adicionando ele na rede criada acima
+
+# GERAL
+#
+$ docker network connect [NETWORK-NAME] [CONTAINER-NAME] ; conectar um container a uma rede.
+$ docker network disconnect [NETWORK-NAME] [CONTAINER-NAME] ; desconectar um container a uma rede.
+$ docker container run [OPCAO] --network=[NETWORK-NAME] [CONTAINER-NAME] ; conectar um container a uma rede durante a inicializacao do mesmo.
+$ docker run -p [HOST-PORT]:[CONTAINER-PORT] --name [CONTAINER-NAME] -t [IMAGE-NAME] ; exportar uma porta

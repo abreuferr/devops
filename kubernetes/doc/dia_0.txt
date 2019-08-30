@@ -1,0 +1,201 @@
+#: Title : Descomplicando o Kubernetes
+#: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
+#: Description : Descomplicando o Kubernetes - treinamento jeferson fernando noronha 
+#: Options : None
+
+# KUBERNETES
+#
+O aplicativo Kubernetes eh utilizado para executar e gerenciar aplicativos em containers
+em um ambiente clusterizado.
+
+dois tipo de maquinas em um ambiente k8s, master e node.
+Master - gerencia o ambiente k8s
+Nodes - nos de um cluste. computadores responsavel por executar todo trabalho do cluster.
+
+toda aplicacao eh executado em containers, que comumente eh utilizado o Docker.
+
+###
+# COMPONENTES DO MASTER
+###
+
+# ETCD
+#
+o etcd eh responsavel por armazenar todas as configuracoes do cluster.
+
+o etcd armazena os dados de configuracao e que podem ser acessados por cada node no
+cluster. O etcd pode ser utilizado para a descoberta de servicos, podem ajudar os
+componentes dos cluster a se configurarem ou se configurarem de acordo com informacoes
+atualizadas..
+
+o etcd pode ser configurado em um unico servidor ou pode ser distribuido em varios
+computadores.
+
+# KUBE-APISERVER
+#
+principal ponto de contato do cluster, pois permite que o administrador configure
+cargas de trabalho e unidades organizacionais do k8s.
+
+responsa por se certificar de que o armazenamento do etcd e os detalhes do servicos
+dos servicos dos container implantados estao de acordo.
+
+basicamente o kube-apiserver age como um intermediador entre os varios componentes
+para manter o funcionamento do cluster.
+
+# KUBE-CONTROLLER-MANAGER
+#
+gerencia diferentes controladores que regulam o estado do cluster, gerencia o ciclo
+de vida das cargas de trabalho, e realiza tarefas rotineiras.
+
+um controlador de replicacao assegura que o numero de replicas definidas para um pod
+corresponda ao numero atualmente implantado no cluster. os detalhes da operacao desta
+operacao sao gravados no etcd.
+
+# KUBE-SCHEDULER
+#
+o processo que de fato atribui cargas de trabalho aos nodes especificos no cluster
+eh o scheduler ou o agendador.
+
+o scheduler le os requisitos da carga de trabalho e distribui os trabalhos de acordo
+com a infraestrutura atual. desta forma, o trabalho pode ser distribuido para os nodes
+de forma aceitavel.
+
+o scheduler tem a funcao de rastrear a capacidade disponivel em cada node do cluster
+para se certificar de que nao foi distribuido servicos alem da capacidade de cada node
+do cluster.
+
+# KUBE CLOUD CONTROLLER MANAGER
+#
+o cloud controller manager serve como um orquestrador que permite que o k8s interaja
+com diferentes provedores de nuvem.
+
+###
+# COMPONENTES DO NODES
+###
+
+# RUNTIME DE CONTAINER
+#
+docker
+
+responsavel por inicializar e gerenciar os container.
+
+# KUBELET
+#
+responsavel pelo contato de cada node com o grupo do cluster.
+
+eh responsavel por replicar as informacoes de configuracao e
+interagir como etcd para ler ou gravar configuracoes.
+
+o kubelet assume a responsabilidade pela manutencao do estado
+do trabalho no servidor de nodes. Ele controla o runtime de
+container para ativar ou desativar containers quando necessario.
+
+# KUBE-PROXY
+#
+gerenciar sub-redes do cluster.
+
+esse componente eh executado em cada node do cluster.
+
+###
+# OBJETOS E CARGAS DE TRABALHO DO KUBERNETES
+###
+
+# PODS
+#
+o pod eh a unidade mais basica de um cluster k8s.
+
+um ou mais containers sao acoplados em um objeto chamado pod.
+
+pods consiste em containers que operam em conjunto, compartilham
+ciclo de vida, e devem sempre passar pelo schedulind do mesmo node.
+
+em cada node do cluster podem existir um ou mais de um pod. eles
+compartilham o ambiente, volumes e espaço de IP.
+
+# CONTROLE DE REPLICACAO
+#
+frequentemente, ao trabalhar com o k8s, nao se trabalha com um unico
+pod, mas com varios pods identicos e replicados. Estes pods sao criados
+a partir de um modelo de pod e pode ser escalados de forma horizontal e
+sao controlados por controladores de nome REPLICATION CONTROLLERS e
+REPLICATION SETS.
+
+# REPLICATION CONTROLLER/CONTROLE DE REPLICACAO
+#
+eh um objeto que define um modelo de pod e os paramentros de controle
+para escalar replicas identicas ou decrementar o numero de copias em
+execucao.
+
+o replication controller sabe como criar novos pods quando necessario
+pois o mesmo possui uma definicao de pod dentro das configuracoes dele.
+
+o replication controller eh responsavel por assegurar que o numero de
+pods em execucao no cluster corresponde ao numero de pods em sua 
+confiuracao. o replication controller ira criar ou destruir pods de
+acordo com a configuracao indicada em suma confiuracao.
+
+# REPLICATION SETS/CONJUNTO DE REPLICACAO
+#
+o replication set sao uma evolucao do replication controller, desta
+forma, os replication sets estao comecando a substituir os replication 
+controller.
+
+# DEPLOYMENTS
+#
+deployments sao objetos de alto nivel projetados para facilitar o
+gerenciamento do ciclo de vida de pods replicados.
+
+os deployments podem ser modificados e por consequencia ira alterar
+a configuracao e o k8s ira ajustar os REPLICATION SETS, gerenciara a
+transicao entre diferentes versoes de aplicacoes.
+
+# STATEFUL SETS
+#
+sao pods controladores especializados que oferecem pedidos e garantias
+de exclusividade.
+
+geralmente o Stateful Sets sao associados a aplicacoes orientadas a 
+dados, como banco de dados, que precisam de acesso aos mesmos volumes,
+mesmo se reprogramado para um novo node.
+
+# DAEMON SETS
+#
+Daemon Sets são outra forma especializada de controlador de pods que 
+executa uma cópia de um pod em cada node no cluster. Isso geralmente 
+é útil ao implantar pods que ajudam a executar a manutenção e fornecem 
+serviços para os próprios nodes.
+
+# SERVICO
+#
+um servico eh um componente que atua como um balanceador de carga
+basico interno e um embaixador para os pods. Um servico agrupa 
+colecoes logicas de pods que executam a mesma funcao para apresenta-los
+como uma entidade unica.
+
+o endereco ip de um servico permanece estavel, independente das alteracoes
+nos pods para os quais ele eh encaminhado.
+
+servico para servidor web e servico para banco de dados.
+
+LoadBalance - cria um balanceador de carga externo para rotear para
+o servico usando a integracao do balanceador de carga do k8s do
+provedor de nuvem. o Cloud Controller Manager criara os recursos
+apropriados e o configurara usando os enderecos de servicos internos.
+
+# VOLUME E VOLUME PERSISTENTE
+#
+volume - area que permite o compartilhamento dos dados entre os containers
+dentro de um pod e permanece salvo ate que o pod seja encerrado.
+
+volume persistente - sao um mecanismo para abstrair armazenamento mais
+robusto que nao esta vinculado ao ciclo de vida de um pod. depois que
+o pod eh excluido, os dados armazenados ficam armazenados ate que os
+mesmo sao excluidos de alguma forma.
+
+# LABELS
+#
+Um label no K8s é uma tag que pode ser anexada a objetos do K8s para 
+marcá-los como parte de um grupo. trabalha com o conceito de chave-valor.
+
+# ANNOTATIONS
+#
+permite anexar informacoes arbitrarias de chave-valor a um objeto.

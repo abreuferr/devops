@@ -1,0 +1,160 @@
+#: Title : Docker Swarm and MySQL Cluster
+#: Date : 2016-11-03
+#: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
+#: Version : 1.0
+#: Description : MySQL em Cluste (Galera/Percona XtraDB Cluster) e o Docker Swarm
+#: Options : 
+#: Reference :  http://galeracluster.com/products/  
+		http://severalnines.com/blog/mysql-docker-introduction-docker-swarm-mode-and-multi-host-networking
+
+1. Infraestrutura
+       - db1
+       - db2
+       - db3
+       - db4
+       - db5
+
+2. Criacao do Cluster Docker
+2.1. Criacao dos nos do cluster
+# criacao dos 5 nos do cluster
+#
+$ for N in 1 2 3 4 5; do docker-machine create --driver virtualbox node$N; done
+
+# visualizar os 5 nos do cluster em execucao
+#
+$ docker-machine ls
+NAME    ACTIVE   DRIVER       STATE     URL                         SWARM   DOCKER    ERRORS
+node1   -        virtualbox   Running   tcp://192.168.99.114:2376           v1.12.3
+node2   -        virtualbox   Running   tcp://192.168.99.115:2376           v1.12.3
+node3   -        virtualbox   Running   tcp://192.168.99.116:2376           v1.12.3
+node4   -        virtualbox   Running   tcp://192.168.99.117:2376           v1.12.3
+node5   -        virtualbox   Running   tcp://192.168.99.118:2376           v1.12.3
+
+2.2. Criacao do cluster
+# node1
+#
+$ eval $(docker-machine env node1)
+
+# node1
+#
+# tornando o node1 o manager do cluster
+#
+$ docker swarm init --advertise-addr 192.168.99.114
+	Swarm initialized: current node (3bjc0qloq9o501vku2ghl98au) is now a manager.
+	To add a worker to this swarm, run the following command:
+    		docker swarm join --token SWMTKN-1-0svdinkpe758rebe28yarp9uua09z7h0knag0z492wb7dwsuh4-dy83cew3bi2da40ngb0yk9qm6 192.168.99.114:2377
+	To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
+
+$ eval $(docker-machine env node2)
+$ docker swarm join --token SWMTKN-1-0svdinkpe758rebe28yarp9uua09z7h0knag0z492wb7dwsuh4-dy83cew3bi2da40ngb0yk9qm6 192.168.99.114:2377
+$ eval $(docker-machine env node3)
+$ docker swarm join --token SWMTKN-1-0svdinkpe758rebe28yarp9uua09z7h0knag0z492wb7dwsuh4-dy83cew3bi2da40ngb0yk9qm6 192.168.99.114:2377
+$ eval $(docker-machine env node4)
+$ docker swarm join --token SWMTKN-1-0svdinkpe758rebe28yarp9uua09z7h0knag0z492wb7dwsuh4-dy83cew3bi2da40ngb0yk9qm6 192.168.99.114:2377
+$ eval $(docker-machine env node5)
+$ docker swarm join --token SWMTKN-1-0svdinkpe758rebe28yarp9uua09z7h0knag0z492wb7dwsuh4-dy83cew3bi2da40ngb0yk9qm6 192.168.99.114:2377
+
+$ eval $(docker-machine env node1)
+$ docker node ls
+	ID                           HOSTNAME  STATUS  AVAILABILITY  MANAGER STATUS
+	2ousxh4qvm23rb84rke22w64e    node2     Ready   Active
+	35bniaii9quuxo9lpaxk2b954    node4     Ready   Active
+	3bjc0qloq9o501vku2ghl98au *  node1     Ready   Active        Leader
+	91ekmgyycl5comh3cz1mkieei    node5     Ready   Active
+	cccnh6ynizxr4v1khrup931zl    node3     Ready   Active
+
+
+3. Overlay Networ
+3.1. Criacao
+# criacao da rede mynet do tipo overlay
+#
+$ eval $(docker-machine env node1)
+$ docker network create --driver overlay mynet
+	e47wwb6r5gjrmbp7o56an3400k
+
+#
+# informacao sobre a rede mynet criada
+#
+$ docker network ls
+	NETWORK ID          NAME                DRIVER              SCOPE
+	avpk3635juvf        ingress             overlay             swarm
+	e47wwb6r5gjr        mynet               overlay             swarm
+
+$ docker network inspect mynet
+	"Name": "mynet",
+	"Subnet": "10.0.0.0/24",
+	"Gateway": "10.0.0.1"
+
+3.2. Key-Value Store
+#
+# no modoo Docker Engine Swarm mode, nao eh necessario um Key-Value Store. A imagem proveniente do Percona-Lab
+# necessita de um Key-Value Store etcd. 
+#
+$ eval $(docker-machine env node1)
+$ curl -w "\n" 'https://discovery.etcd.io/new?size=1'
+	https://discovery.etcd.io/26811215fee2764ed0a173db4b17b27a
+$ docker service create --name etcd --replicas 1 --network mynet -p 2379:2379 -p 2380:2380 -p 4001:4001 -p 7001:7001 elcolio/etcd:latest -name etcd -discovery=https://discovery.etcd.io/26811215fee2764ed0a173db4b17b27a
+
+# foi criado um conainer etcd no node1 que eh um key-value store
+# esse etcd esta sobre a rede do tipo overlay e de nome mynet
+#
+$ docker ps
+	CONTAINER ID        IMAGE                 COMMAND                  CREATED              STATUS              PORTS                               NAMES
+	c23cc0d980a1        elcolio/etcd:latest   "/bin/run.sh -name et"   About a minute ago   Up 2 minutes        2379-2380/tcp, 4001/tcp, 7001/tcp   etcd.1.900csza6hmz4gjf9cm1x6i92s
+
+#
+# o container de nome etcd assumiu o IP 10.0.0.2
+#
+$ docker service inspect etcd -f "{{ .Endpoint.VirtualIPs }}"
+	[{avpk3635juvf1wl0wtzzli3t0 10.255.0.8/16} {e47wwb6r5gjrmbp7o56an3400 10.0.0.2/24}]
+
+4. MySQL Cluster
+4.1. Deploy
+
+#
+# Deploy do MySQL Percona por todos os nos do cluster
+#
+$ docker service create --name mysql-galera --replicas 5 -p 3306:3306 --network mynet --env MYSQL_ROOT_PASSWORD=mypassword --env DISCOVERY_SERVICE=10.0.0.2:2379 --env XTRABACKUP_PASSWORD=mypassword --env CLUSTER_NAME=galera perconalab/percona-xtradb-cluster:5.6
+
+$ docker service ps mysql-galera
+	ID                         NAME            IMAGE                                  NODE   DESIRED STATE  CURRENT STATE             ERROR
+	ekvhnvb5jxbf4r13u9j6jgnpm  mysql-galera.1  perconalab/percona-xtradb-cluster:5.6  node3  Running        Preparing 14 seconds ago
+	1ec1js02upgvihp1q6xw59xbk  mysql-galera.2  perconalab/percona-xtradb-cluster:5.6  node2  Running        Preparing 14 seconds ago
+	bcexln6kzhxa5zhgx5sfwun6y  mysql-galera.3  perconalab/percona-xtradb-cluster:5.6  node5  Running        Preparing 14 seconds ago
+	c4tonkkrn5qvow7bgcj6a7qpv  mysql-galera.4  perconalab/percona-xtradb-cluster:5.6  node4  Running        Preparing 14 seconds ago
+	27uryuqaelwfxb2dzap4a0die  mysql-galera.5  perconalab/percona-xtradb-cluster:5.6  node1  Running        Preparing 14 seconds ago
+
+$ docker service ls
+	ID            NAME          REPLICAS  IMAGE                                  COMMAND
+	4l2fq4ug01dg  mysql-galera  0/5       perconalab/percona-xtradb-cluster:5.6
+	6stw3v5efn6s  etcd          1/1       elcolio/etcd:latest                    -name etcd -discovery=https://discovery.etcd.io/26811215fee2764ed0a173db4b17b27a
+
+#
+# Desta forma, o IP virtual assumido pelo MySQL cluster eh o IP 10.0.0.4
+# 
+$ docker service inspect mysql-galera -f "{{ .Endpoint.VirtualIPs }}"
+	[{avpk3635juvf1wl0wtzzli3t0 10.255.0.10/16} {e47wwb6r5gjrmbp7o56an3400 10.0.0.4/24}]
+
+5. WordPress
+5.1. Deploy
+#
+# deploy da ferramenta wordpress para os quatro nos do cluster
+#
+$ eval $(docker-machine env node1)
+$ docker service create --name wordpress --replicas 4 -p 80:80 --network mynet --env WORDPRESS_DB_HOST=mysql-galera --env WORDPRESS_DB_USER=root --env WORDPRESS_DB_PASSWORD=mypassword wordpress
+
+#
+# containers a onde foram instalados o software wordpress
+#
+$ docker service ps wordpress
+	ID                         NAME         IMAGE      NODE   DESIRED STATE  CURRENT STATE                     ERROR
+	1cb55vsidjbprxh92h99i69l0  wordpress.1  wordpress  node2  Running        Preparing less than a second ago
+	41icbtfl4y193ufd32dwp9s0x  wordpress.2  wordpress  node4  Running        Preparing less than a second ago
+	6y6uk85rqdocpkmv58ve1aums  wordpress.3  wordpress  node5  Running        Preparing less than a second ago
+	6twwoffwqh35kq62fa0xucsjq  wordpress.4  wordpress  node3  Running        Preparing less than a second ago
+
+#
+# Desta forma, o IP virtual assumido pelo MySQL cluster eh o IP 10.0.0.10
+# 
+$ docker service inspect wordpress -f "{{ .Endpoint.VirtualIPs }}"
+	[{avpk3635juvf1wl0wtzzli3t0 10.255.0.16/16} {e47wwb6r5gjrmbp7o56an3400 10.0.0.10/24}]

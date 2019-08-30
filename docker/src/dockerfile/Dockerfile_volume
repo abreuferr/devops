@@ -1,0 +1,12 @@
+# docker build --no-cache -f [DOCKERFILE_NAME] -t [IMAGE_NAME]:[VERSAO] . ; contrucao da imagem
+
+# docker container run -d -p [PORTA_HOST]:[PORTA_CONTAINER] [IMAGE_NAME]:[VERSAO] ; execucao do containe
+
+# imagem a ser utilizada para construir o container
+FROM debian
+
+# mantenedor do Dockerfile
+MAINTAINER caio abreu ferreira - abreuferr@gmail.com
+
+# Criar um volume
+VOLUME /dockerVolume

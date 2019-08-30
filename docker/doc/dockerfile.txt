@@ -1,0 +1,42 @@
+#: Title : Dockerfile e DockerHub
+#: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
+#: Description : treinamento do dia 03 - Dockerfile e DockerHub
+#: Options : distribuicao utilizada - gnu/linux debian
+
+# TEORIA
+#
+# comando do Dockerfile
+#
+# FROM - imagem base que sera utilizado para criar a nova imagem ; FROM <image name>
+# MAINTAINER - mantenedor da imagem ; MAINTAINER <author name>
+# RUN - executa um comando durante a criacao da imagem ; RUN <command>
+# CMD - executa um comando durante a execucao do container ; CMD ["executable","param1","param2"] ou CMD executable param1 param2
+# ADD -  copia novos arquivos, diretorios ou arquivos remotos da <origem> para o <destino> na imagem ; ADD $VARIAVEL_NOME
+# COPY - copia novos arquivos diretorios da <origem> para o <destino> no container
+# ENV - define uma variavel de ambiente ; ENV [VARIAVEL_NOME] [VARIAVEL_CONTEUDO]
+# ENTRYPOINT - permite executar um comando ou executavel enquanto o container estiver em execucao ; ENTRYPOINT ["EXECUTAVEL","PARAMETRO"] ou ENTRYPOINT EXECUTAVEL PARAMETRO
+# WORKDIR - responsavel por mudar do diretorio / (raiz) para o especificado nele - WORKDIR /path/to/workdir ou WORKDIR ${VARIAVEL_NOME}
+# USER - define o username ou UID que sera criado com a imagem, o padrao eh o usuario root
+# VOLUME - ativa o link/diretorio entre o container e o computador host
+# LABEL - adiciona metadados a imagem
+# COPY - copia arquivos do host para o container
+# EXPOSE - informa em qual porta o container esta monitorando
+
+#
+# Por padrao o nome do arquivo do docker file eh o "Dockerfile", mas com o parametro -f eh possivel
+# ler do dockerfile com outro nome.
+#
+
+$ docker build -t [DOCKERHUB-USERNAME]/[IMAGE_NAME]:[VERSAO.X] .
+$ docker build --no-cache -f [DOCKERFILE_NAME] -t [DOCKERHUB-USERNAME]/[IMAGE_NAME]:[VERSAO] . 
+$ docker image ls
+
+###
+# DOCKERHUB
+###
+
+$ docker login -u [DOCKERHUB-USERNAME] ; login no dockerhub
+$ docker image push [DOCKERHUB-USERNAME]/[IMAGE_NAME]:[VERSAO] ; enviar a imagem para o dockerhub
+$ docker container run -d -p 80:80 abreuferr/exemploX:1.0 ; fazer o download do dockerhub
+$ docker image pull [DOCKERHUB-USERNAME]/[IMAGE_NAME]:[VERSAO] ; fazer o download da imagem no dockerhub
+$ docker logoun ; logout no dockerhub
