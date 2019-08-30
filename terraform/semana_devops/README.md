@@ -1,6 +1,6 @@
-#: Title : terraform
+#: Title : semana devops
 #: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
-#: Description : texto sobre terraform
+#: Description : howto do treinamento terraform da semana devops
 #: Options :
 
 # credencial de acesso a AWS
