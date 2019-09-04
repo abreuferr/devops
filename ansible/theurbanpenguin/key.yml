@@ -1,0 +1,9 @@
+---
+- name: add keys to hosts
+  hosts: all
+  tasks: 
+  - name: install key
+    authorized_key:
+      user: cosmo
+      state: present
+      key: "{{ lookup('file', '/home/cosmo/.ssh/id_rsa.pub') }}"
