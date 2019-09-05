@@ -9,15 +9,15 @@
 
 # instalar o aplicativo "sshpass".
 
+# arquivo com uma lista dos hosts
+$ cat inventory
+    192.168.10.2[0:1]
+
 # arquivo de configuracao
 $ cat ansible.cfg
     [defaults]
     inventory=/Users/cosmo/myprojects/devops/ansible/theurbanpenguin/inventory
     remote_user=cosmo
-
-# lista com os hosts
-$ cat inventory
-    192.168.10.2[0:1]
 
 # listar os hosts do inventory
 $ ansible all --lists-hosts
@@ -37,7 +37,7 @@ $ ssh-agent zsh
 $ ssh-add ~/.ssh/id_rsa
 
 # arquivo de configuracao da chave.
-$ cat key.yml
+$ cat keys.yml
 ---
 - name: add keys to hosts
   hosts: all
@@ -53,4 +53,4 @@ $ ansible-playbook --syntax-check keys.yml
 
 # enviando a chave publica para todos os hosts
 # listados no arquivo "inventory".
-$ ansible-playbook -k key.yml
+$ ansible-playbook -k keys.yml
