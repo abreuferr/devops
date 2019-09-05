@@ -32,8 +32,7 @@ $ ssh-keyscan 192.168.10.21 >> ~/.ssh/known_hosts
 $ ssh-keygen -t rsa
 
 # comando "ssh-add"
-$ ssh-agent bash
-$ ssh-agent zsh
+$ eval "$(ssh-agent -s)"
 $ ssh-add ~/.ssh/id_rsa
 
 # arquivo de configuracao da chave.
