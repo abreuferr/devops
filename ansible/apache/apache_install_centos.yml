@@ -1,7 +1,6 @@
 ---
 - name: Install apache
   hosts: centos
-  become: true
   tasks:
 
   - name: Add epel-release repo
