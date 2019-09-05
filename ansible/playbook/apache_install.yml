@@ -1,0 +1,44 @@
+---
+- name: Install apache
+  hosts: centos
+  become: true
+  tasks:
+
+  - name: Add epel-release repo
+    yum:
+      name: epel-release
+      state: present
+
+  - name: Install apache
+    yum:
+      name: httpd
+      state: present
+
+  - name: Don't Listen All Interfaces
+    lineinfile:
+      path: /etc/httpd/conf/httpd.conf
+      regexp: '^Listen 80'
+      state: absent
+    
+  - name: Listen Single Interface
+    lineinfile:
+      path: /etc/httpd/conf/httpd.conf
+      insertafter: '^#Listen'
+      line: 'Listen {{ ansible_default_ipv4.address }}:80'
+
+  - name: Insert Index Page
+    template:
+      src: /home/cosmo/ansible/index.html
+      dest: /var/www/html/index.html
+
+  - name: Start Apache
+    service:
+      name: httpd
+      state: started
+
+  - name: Open Firewall
+    firewalld:
+      service: http
+      state: enabled
+      permanent: true
+      immediate: true
