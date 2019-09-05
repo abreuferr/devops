@@ -1,9 +1,9 @@
-#: Title : ansible
+#: Title : Ansible
 #: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
 #: Description : Ansible User Module
 #: Options : https://www.youtube.com/channel/UCFFLP0dKesrKWccYscdAr9A
 
-# configuracao do ansible
+# ansible configuration file
 $ cat ansible.cfg
     [defaults]
     inventory = /Users/cosmo/myprojects/devops/ansible/theurbanpenguin/inventory
@@ -13,7 +13,7 @@ $ cat ansible.cfg
     become_method = sudo
     become_user = root
 
-# inventario
+# inventory file
 $ cat inventory
     [centos]
     192.168.10.20
@@ -21,35 +21,16 @@ $ cat inventory
     [debian]
     192.168.10.21
 
-# variavel
+# variable
 $ cat group_vars/redhat
-    admin_group = wheek
-    default_user_password: Passwd1
+    admin_group = wheel
+    default_user_password: passwd
 
 $ cat group_vars/ubuntu
     admin_group = sudo
-    default_user_password: Passwd1
+    default_user_password: passwd
 
-# apagar usuario
-$ cat delete-users.yml
----
-- name: clear user account
-  hosts: all
-  gather_facts: true
-  become: true
-  tasks:
-
-    - name: delete  users
-      user:
-        name: {{ item }}
-        state: absent
-        remove: true
-      loop:
-        - bob
-        - dizzy
-...
-
-# criar usuario
+# create user
 $ cat create-users.yml
 ---
 - name: Create New Users
@@ -70,13 +51,13 @@ $ cat create-users.yml
         - dizzy
 ...
 
-# criar usuario
+# create user
 $ ansible-playbook create-users.yml -b -K
 
-# criptografar a senha
+# password
 $ ansible-vault encrypt group_vars/redhat
 
-# apagar usuario
+# delete user
 $ cat delete-users.yml
 ---
 - name: clear user account
