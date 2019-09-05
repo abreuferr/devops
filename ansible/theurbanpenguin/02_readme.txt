@@ -48,6 +48,9 @@ $ cat key.yml
       state: present
       key: "{{ lookup('file', '/Users/cosmo/.ssh/id_rsa.pub') }}"
 
+# checando o arquivo key.yml
+$ ansible-playbook --syntax-check keys.yml
+
 # enviando a chave publica para todos os hosts
 # listados no arquivo "inventory".
 $ ansible-playbook -k key.yml
