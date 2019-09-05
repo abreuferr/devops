@@ -54,8 +54,18 @@ $ cat create-users.yml
 # create user
 $ ansible-playbook create-users.yml -b -K
 
-# password
+# criptografar a senha armazenada no arquivo.
 $ ansible-vault encrypt group_vars/redhat
+$ ansible-vault encrypt group_vars/ubuntu
+
+# visualizar ou editar o arquivo de senha
+$ ansible-vault view group_vars/redhat
+$ ansible-vault view group_vars/ubuntu
+
+# agora eh necessario especificar a senha
+# quando for executar o Playbook para criar
+# o usuario.
+$ ansible-playbook --vault-id @prompt create-users.yml
 
 # delete user
 $ cat delete-users.yml
@@ -73,5 +83,7 @@ $ cat delete-users.yml
         remove: true
       loop:
         - bob
+        - wendy
+        - lofty
         - dizzy
 ...
