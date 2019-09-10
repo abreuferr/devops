@@ -1,0 +1,33 @@
+---
+- hosts: kmaster
+  become: yes
+  tasks:
+
+    - name: inicializando o cluster
+      shell: kubeadm init --pod-network-cidr=192.168.10.0/24 >> cluster.txt
+      args:
+        chdir: $HOME
+        creates: cluster.txt
+
+    - name: criando o diretorio .kube
+      become: yes
+      become_user: cosmo
+      file:
+        path: $HOME/.kube
+        state: directory
+        mode: 0755
+
+    - name: copiando o arquivo de configuracao do k8s para o diretorio do usuario
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /home/cosmo/.kube/config
+        remote_src: yes
+        owner: cosmo
+
+    - name: instalacao do Pod Network
+      become: yes
+      become_user: cosmo
+      shell: kubectl apply -f sudo kubectl apply -f https://docs.projectcalico.org/v3.8/manifests/calico.yam
+      args:
+        chdir: $HOME
+        creates: pod_setup.txt

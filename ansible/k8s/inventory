@@ -1,12 +1,10 @@
-192.168.10.2[1:2]
+192.168.10.2[1:3]
 
-[debian]
+[kmaster]
 192.168.10.21
 
-[centos]
-192.168.10.22
+[knode]
+192.168.10.2[2:3]
 
-[debian:vars]
-ansible_python_interpreter=/usr/bin/python3
-[centos:vars]
+[all:vars]
 ansible_python_interpreter=/usr/bin/python3
