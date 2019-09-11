@@ -1,10 +1,11 @@
-192.168.10.2[1:3]
+192.168.10.2[3:5]
 
-[kmaster]
-192.168.10.21
+[master]
+192.168.10.23
 
-[knode]
-192.168.10.2[2:3]
+[node]
+192.168.10.24
+192.168.10.25
 
 [all:vars]
 ansible_python_interpreter=/usr/bin/python3
