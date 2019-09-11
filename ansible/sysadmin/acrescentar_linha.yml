@@ -1,0 +1,15 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    # adicionar uma linha depois de uma determinada string.
+    - name: Adicionando linha
+      become: yes
+      become_user: devops
+      lineinfile:
+        path: /tmp/httpd.conf
+        insertafter: "^Listen [0-9]+"
+        line: "Listen 443"
+        firstmatch: yes
+        state: present
+        backup: yes

@@ -1,0 +1,13 @@
+- hosts: all
+  become: yes
+  tasks:
+    - name: criando usuarios
+      user:
+        name:  "{{ item.name }}"
+        #group: "{{ item.group }}"
+        groups: "{{ item.groups }}"
+        state: present
+      loop:
+        - { name: 'caio', groups: 'users' }
+        - { name: 'marcos', groups: 'users' }
+        - { name: 'clovis', groups: 'users' }

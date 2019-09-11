@@ -1,0 +1,13 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    # copiar arquivo para um destino.
+    - name: copiar de arquivo.
+      copy:
+        src: ~/devops/ansible/sysadmin/httpd.conf
+        dest: /tmp/httpd.conf
+        owner: devops
+        group: devops
+        mode: '0755'
+        backup: yes

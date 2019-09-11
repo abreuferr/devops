@@ -1,0 +1,12 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    # criar diretorio
+    - name: criando diretorio.
+      file:
+        path: /tmp/httpd
+        state: directory
+        owner: devops
+        group: users
+        mode: '0755'
