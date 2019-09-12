@@ -52,3 +52,9 @@
       - docker-ce
       - docker-ce-cli
       - containerd.io
+
+  # Docker service is disabled by default
+  - name: ativando o servico do docker
+    systemd:
+      name: docker
+      enabled: yes
