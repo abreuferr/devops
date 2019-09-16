@@ -7,3 +7,7 @@
       user: cosmo
       state: present
       key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
+    # paralelismo
+    async: 300
+    poll: 10

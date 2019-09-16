@@ -12,5 +12,5 @@
 [dbserver]
 192.168.10.22
 
-[debian:vars]
+[all:vars]
 ansible_python_interpreter=/usr/bin/python3

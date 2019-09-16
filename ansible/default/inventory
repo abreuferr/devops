@@ -1,7 +1,7 @@
 [all]
-manager ansible_host=192.168.10.20
-node1 ansible_host=192.168.10.21
-node2 ansible_host=192.168.10.22
+manager ansible_host=192.168.10.20 ansible_user=devops
+node1 ansible_host=192.168.10.21 ansible_user=devops
+node2 ansible_host=192.168.10.22 ansible_user=devops
 
 [master]
 manager
