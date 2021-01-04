@@ -1,0 +1,34 @@
+---
+- name: instalacao do software docker
+  hosts: debian
+  become: true
+  become_user: root
+  tasks:
+
+    - name: removendo uma lista de softwares
+      apt:
+        name: "{{ packages }}"
+        state: absent
+        autoremove: yes
+        purge: yes
+      vars:
+        packages:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - python3-pip
+          - virtualenv
+          - python3-setuptools
+          - docker-ce 
+
+    - name: Add Docker apt key.
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        id: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+        state: present
+
+    - name: removendo o repositorio do docker
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu bionic stable
+        state: absent

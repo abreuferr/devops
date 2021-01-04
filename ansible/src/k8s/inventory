@@ -1,0 +1,14 @@
+[all]
+kmaster ansible_host=192.168.10.23
+knode1 ansible_host=192.168.10.24
+knode2 ansible_host=192.168.10.25
+
+[master]
+kmaster ansible_host=192.168.10.23
+
+[node]
+knode1 ansible_host=192.168.10.24
+knode2 ansible_host=192.168.10.25
+
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3

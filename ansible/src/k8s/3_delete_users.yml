@@ -1,0 +1,11 @@
+- hosts: all
+  become: yes
+  tasks:
+    - name: apagando usuario
+      user:
+        name:  "{{ item.name }}"
+        groups: "{{ item.groups }}"
+        remove: "{{ item.remove}}"
+        state: absent
+      loop:
+        - { name: 'cosmo', groups: ' ', remove: 'yes' }

@@ -1,0 +1,17 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    # substituir uma linha em um arquivo baseado em uma
+    # expressao regular
+    - name: substituir linha
+      become: yes
+      become_user: devops
+      lineinfile:
+        path: /tmp/httpd.conf
+        # string a ser procurada
+        regexp: "LogLevel debug"
+        # string a ser substituida
+        line: "LogLevel warn"
+        state: present
+        backup: yes

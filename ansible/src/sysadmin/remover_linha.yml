@@ -1,0 +1,13 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    # remover uma linha de um arquivo
+    - name: apagando linha
+      become: yes
+      become_user: devops
+      lineinfile:
+        path: /tmp/httpd.conf
+        line: "LogLevel_debug"
+        state: absent
+        backup: yes

@@ -1,0 +1,17 @@
+- hosts: all
+  become: yes
+  tasks:
+    - name: criando usuario
+      user: name=devops append=yes state=present createhome=yes shell=/bin/bash
+
+    - name: configuracao do usuario e sudo
+      lineinfile:
+        dest: /etc/sudoers
+        line: 'devops ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
+
+    - name: install key
+      authorized_key:
+        user: devops
+        state: present
+        key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"

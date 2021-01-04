@@ -1,0 +1,49 @@
+---
+- name: Install apache
+  hosts: debian
+  tasks:
+
+    - name: ultima versao
+      apt: 
+        name: nginx 
+        state: latest
+        autoclean: yes
+      become: yes
+
+    - name: inicializar o nginx
+      service:
+        name: nginx
+        state: started
+      become: yes
+
+    - name: criando diretorio
+      file:
+        path: /var/www/particula.local/html
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: copiar o arquivo de configuracao e inicializar o nginx
+      copy:
+        src: /home/cosmo/ansible/nginx/particula.local
+        dest: /etc/nginx/sites-available/particula.local
+      become: yes
+
+    - name: criar link simbolico
+      file:
+        src: /etc/nginx/sites-available/particula.local
+        dest: /etc/nginx/sites-enabled/particula.local
+        state: link
+      become: yes
+
+    - name: copiar o conteudo do site
+      copy:
+        src: /home/cosmo/ansible/nginx/index.html
+        dest: /var/www/particula.local/html
+
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
+      become: yes
