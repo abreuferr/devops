@@ -75,6 +75,11 @@ $ docker search [IMAGE_NAME] ; procura por uma imagem no DockerHub
 $ docker image ls ; exibir as imagens que estao armazenados no computador
 $ docker image pull [IMAGE_NAME] ; somente faz o download da imagem do DockerHub
 $ docker image history [IMAGE-NAME] ; exibi o historico da imagem
+$ docker image inspect [IMAGE_NAME] ; exibir informações sobre a imagem
+
+$ docker image save [IMAGE_NAME] [BACKUP.tar] ; backup de uma imagem em um arquivo
+$ docker image load - [BACKUP.tar] ; restaurar a imagem que foi feita o backup
+$ docker image rm -f [IMAGE_NAME] ; apagar imagem
 
 ##
 # CONTAINER
@@ -91,26 +96,39 @@ $ docker container run [IMAGE_NAME] ; download da imagem, cria o container e exe
 $ docker contaienr run -ti [IMAGE_NAME] ; download da image, cria o container e acessar o container (modo interativo)
 $ docker container run -ti --name [CONTAINER_NAME] [IMAGE_NAME] ; executa o container - Ctrl+p + Ctrl + q ; sair sem finalizar o container
 $ docker container attach [CONTAINER_ID] ; acessar o container
-$ docker container run -ti --name [CONTAINER_NAME] -d [IMAGE_NAME] ; executa o container e detach
+$ docker container run -dit --name [CONTAINER_NAME] ; executa o container e detach
+$ docker container run -dit --name [CONTAINER_NAME] --hostname [HOSTNAME] [IMAGE_NAME]; executa o container e detach e alterar o hostname do container
+
+# LS
+#
 $ docker container ls ; visualizar os containers que estao ativos
 $ docker container ls -a ; visualizar os containers que estao ativos e inativos
+
+# ATTACH/DETACH
+#
+$ docker container attach [CONTAINER_NAME] ; acessar o container
+
+<Ctrl> + <p> depois <Ctrl> <q> ; sair do container sem matar o container
 
 # START/STOP
 #
 $ docker container start [CONTAINER_ID] ; inicializar o container
 $ docker container start $(docker ps -a -q) ; parar todos os containers
-$ docker contaienr stop [CONTAINER_ID] ; finalizar o container
+$ docker container stop [CONTAINER_ID] ; finalizar o container pelo CONTAINER_ID
+$ docker container stop [CONTAINER_NAME] ; finalizar o container pelo CONTAINER_NAME
 $ docker container stop $(docker ps -a -q) ; parar todos os containers
 
 # PAUSE/UNPAUSE
 #
 $ docker container pause [CONTAINER_ID] ; pausar a execucao do container
-$ docker containet unpause [CONTAINER_ID] ; despausar a execucao do container
+$ docker container unpause [CONTAINER_ID] ; despausar a execucao do container
 
 # APAGAR
 #
-$ docker container rm [CONTAINER_ID] ; apagar o container
-$ docker container rm -f [CONTAINER_ID] ; apaga o container de forma forcada
+$ docker container rm [CONTAINER_ID] ; apagar o container pelo CONTAINER_ID
+$ docker container rm [CONTAINER_NAME] ; apagar o container pelo CONTAINER_NAME
+$ docker container rm -f [CONTAINER_ID] ; apaga o container de forma forcada pelo CONTAINER_ID
+$ docker container rm -f [CONTAINER_NAME] ; apaga o container de forma forcada pelo CONTAINER_NAME_NEW
 $ docker container rm $(docker ps -a -q) ; apagar todos os containers
 
 # INFO
@@ -118,6 +136,14 @@ $ docker container rm $(docker ps -a -q) ; apagar todos os containers
 $ docker container stats ; estatistica dos containers em execucao
 $ docker container inspect [CONTAINER_ID] ; informacoes sobre o container em execucao
 $ docker container logs -f [CONTAINER-ID] ; log do container
+
+# COPIAR ARQUIVO
+#
+$ docker container cp [FILE_NAME] [CONTAINER_NAME]:[DIR] ; copiar um arquivo para o container
+
+# EXECURTAR COMANDO
+#
+$ docker container exec [CONTAINER_NAME] [COMANDO] ; executar um comando dentro do container
 
 # CUSTOMIZACAO - MEMORIA
 #
@@ -128,3 +154,8 @@ $ docker container update --memory [QTDADEm] [CONTAINER_ID] ; atualizacao da con
 #
 $ docker container run -ti --cpus=[QTDADE] --name [CONTAINER_NAME] [IMAGE_NAME] ; limitar a quantidade de cpu de um container
 $ docker container update --cpus=[QTDADE] [CONTAINER_ID] ; atualizacao da configuracao de um container em execucao em relacao a cpu
+
+# DOCKERHUB - LOGIN/LOGOUT
+#
+$ docker login -u [USUARIO] ; login no DockerHub
+$ docker logout ; logout do DockerHub
