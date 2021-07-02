@@ -7,7 +7,7 @@
 #
 # comando do Dockerfile
 #
-# FROM - imagem base que sera utilizado para criar a nova imagem ; FROM <image name>
+# FROM - imagem base que sera utilizado para criar a nova imagem ; FROM [IMAGE_NAME]:[VERSION] - FROM ubuntu:18.04
 # MAINTAINER - mantenedor da imagem ; MAINTAINER <author name>
 # RUN - executa um comando durante a criacao da imagem ; RUN <command>
 # CMD - executa um comando durante a execucao do container ; CMD ["executable","param1","param2"] ou CMD executable param1 param2
@@ -18,7 +18,7 @@
 # WORKDIR - responsavel por mudar do diretorio / (raiz) para o especificado nele - WORKDIR /path/to/workdir ou WORKDIR ${VARIAVEL_NOME}
 # USER - define o username ou UID que sera criado com a imagem, o padrao eh o usuario root
 # VOLUME - ativa o link/diretorio entre o container e o computador host
-# LABEL - adiciona metadados a imagem
+# LABEL - adiciona metadados a imagem - LABEL ENV=”DEVELOPMENT”
 # COPY - copia arquivos do host para o container
 # EXPOSE - informa em qual porta o container esta monitorando
 
