@@ -1,0 +1,5 @@
+# imagem a ser utilizada
+FROM alpine
+
+ENTRYPOINT [ "echo" ]
+CMD [ "--help" ]

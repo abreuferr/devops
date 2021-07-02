@@ -11,8 +11,8 @@
 # MAINTAINER - mantenedor da imagem ; MAINTAINER <author name>
 # RUN - executa um comando durante a criacao da imagem ; RUN <command>
 # CMD - executa um comando durante a execucao do container ; CMD ["executable","param1","param2"] ou CMD executable param1 param2
-# ADD -  copia novos arquivos, diretorios ou arquivos remotos da <origem> para o <destino> na imagem ; ADD $VARIAVEL_NOME
-# COPY - copia novos arquivos diretorios da <origem> para o <destino> no container
+# ADD -  copia arquivos ou diretorios remotos da <origem> para o <destino> na imagem ; ADD $VARIAVEL_NOME
+# COPY - copia arquivos ou diretorios da <origem> para o <destino> no container
 # ENV - define uma variavel de ambiente ; ENV [VARIAVEL_NOME] [VARIAVEL_CONTEUDO]
 # ENTRYPOINT - permite executar um comando ou executavel enquanto o container estiver em execucao ; ENTRYPOINT ["EXECUTAVEL","PARAMETRO"] ou ENTRYPOINT EXECUTAVEL PARAMETRO
 # WORKDIR - responsavel por mudar do diretorio / (raiz) para o especificado nele - WORKDIR /path/to/workdir ou WORKDIR ${VARIAVEL_NOME}
@@ -30,13 +30,14 @@
 $ docker build -t [DOCKERHUB-USERNAME]/[IMAGE_NAME]:[VERSAO.X] .
 $ docker build --no-cache -f [DOCKERFILE_NAME] -t [DOCKERHUB-USERNAME]/[IMAGE_NAME]:[VERSAO] . 
 $ docker image ls
+$ docker image build -t [IMAGE_NAME] . ; criar um container
 
 ###
 # DOCKERHUB
 ###
 
 $ docker login -u [DOCKERHUB-USERNAME] ; login no dockerhub
-$ docker image push [DOCKERHUB-USERNAME]/[IMAGE_NAME]:[VERSAO] ; enviar a imagem para o dockerhub
-$ docker container run -d -p 80:80 abreuferr/exemploX:1.0 ; fazer o download do dockerhub
+$ docker image tag [IMAGE_NAME] [DOCKERHUB_USERNAME]/[IMAGE_NAME]:[VERSAO] ; mudar a tag da imagem
+$ docker image push [DOCKERHUB_USERNAME]/[IMAGE_NAME]:[VERSAO] ; enviar a imagem para o dockerhub
 $ docker image pull [DOCKERHUB-USERNAME]/[IMAGE_NAME]:[VERSAO] ; fazer o download da imagem no dockerhub
 $ docker logoun ; logout no dockerhub
