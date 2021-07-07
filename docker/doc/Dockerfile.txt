@@ -13,31 +13,30 @@
 # CMD - executa um comando durante a execucao do container ; CMD ["executable","param1","param2"] ou CMD executable param1 param2
 # ADD -  copia arquivos ou diretorios remotos da <origem> para o <destino> na imagem ; ADD $VARIAVEL_NOME
 # COPY - copia arquivos ou diretorios da <origem> para o <destino> no container
-# ENV - define uma variavel de ambiente ; ENV [VARIAVEL_NOME] [VARIAVEL_CONTEUDO]
+# ENV - define uma variavel de ambiente ; ENV [VARIAVEL_NOME] [VARIAVEL_CONTEUDO] ; ENV DB_NAME=”MySQL” ; ENV DB_VERSION=”8.0”
 # ENTRYPOINT - permite executar um comando ou executavel enquanto o container estiver em execucao ; ENTRYPOINT ["EXECUTAVEL","PARAMETRO"] ou ENTRYPOINT EXECUTAVEL PARAMETRO
 # WORKDIR - responsavel por mudar do diretorio / (raiz) para o especificado nele - WORKDIR /path/to/workdir ou WORKDIR ${VARIAVEL_NOME}
 # USER - define o username ou UID que sera criado com a imagem, o padrao eh o usuario root
-# VOLUME - ativa o link/diretorio entre o container e o computador host
+# VOLUME - ativa o link/diretorio entre o container e o computador host ; VOLUME /app/devops
 # LABEL - adiciona metadados a imagem - LABEL ENV=”DEVELOPMENT”
 # COPY - copia arquivos do host para o container
 # EXPOSE - informa em qual porta o container esta monitorando
 
 #
 # Por padrao o nome do arquivo do docker file eh o "Dockerfile", mas com o parametro -f eh possivel
-# ler do dockerfile com outro nome.
+# ler do Dockerfile com outro nome.
 #
 
-$ docker build -t [DOCKERHUB-USERNAME]/[IMAGE_NAME]:[VERSAO.X] .
-$ docker build --no-cache -f [DOCKERFILE_NAME] -t [DOCKERHUB-USERNAME]/[IMAGE_NAME]:[VERSAO] . 
-$ docker image ls
-$ docker image build -t [IMAGE_NAME] . ; criar um container
+$ docker image build -t [DOCKERHUB-USERNAME]/[IMAGE_NAME]:[VERSION.X] .
+$ docker image build --no-cache -f [DOCKERFILE_NAME] -t [DOCKERHUB-USERNAME]/[IMAGE_NAME]:[VERSION] . 
+$ docker image build -t [IMAGE_NAME]:[VERSION] . ; criar um container
 
 ###
 # DOCKERHUB
 ###
 
 $ docker login -u [DOCKERHUB-USERNAME] ; login no dockerhub
-$ docker image tag [IMAGE_NAME] [DOCKERHUB_USERNAME]/[IMAGE_NAME]:[VERSAO] ; mudar a tag da imagem
-$ docker image push [DOCKERHUB_USERNAME]/[IMAGE_NAME]:[VERSAO] ; enviar a imagem para o dockerhub
-$ docker image pull [DOCKERHUB-USERNAME]/[IMAGE_NAME]:[VERSAO] ; fazer o download da imagem no dockerhub
+$ docker image tag [IMAGE_NAME] [DOCKERHUB_USERNAME]/[IMAGE_NAME]:[VERSION] ; mudar a tag da imagem
+$ docker image push [DOCKERHUB_USERNAME]/[IMAGE_NAME]:[VERSION] ; enviar a imagem para o dockerhub
+$ docker image pull [DOCKERHUB-USERNAME]/[IMAGE_NAME]:[VERSION] ; fazer o download da imagem no dockerhub
 $ docker logoun ; logout no dockerhub
