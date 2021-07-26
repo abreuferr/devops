@@ -80,7 +80,7 @@ $ docker image inspect [IMAGE_NAME] ; exibir informações sobre a imagem
 $ docker image save [IMAGE_NAME] [BACKUP.tar] ; backup de uma imagem em um arquivo
 $ docker image load - [BACKUP.tar] ; restaurar a imagem que foi feita o backup
 $ docker image rm -f [IMAGE_NAME] ; apagar imagem
-
+$ docker image prune ; comando utilizado para apagar imagens "perdidas"
 ##
 # CONTAINER
 ##
