@@ -29,6 +29,7 @@
 
 $ docker image build -t [DOCKERHUB-USERNAME]/[IMAGE_NAME]:[VERSION.X] .
 $ docker image build --no-cache -f [DOCKERFILE_NAME] -t [DOCKERHUB-USERNAME]/[IMAGE_NAME]:[VERSION] . 
+$ docker image build --no-cache -f [DOCKERFILE_NAME] -t [IMAGE_NAME]:[VERSION] . 
 $ docker image build -t [IMAGE_NAME]:[VERSION] . ; criar um container
 
 ###

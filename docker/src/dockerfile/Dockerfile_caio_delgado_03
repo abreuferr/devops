@@ -1,0 +1,3 @@
+FROM busybox
+COPY context/conteudo.txt /conteudo.txt
+RUN cat /conteudo.txt
