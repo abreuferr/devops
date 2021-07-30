@@ -3,6 +3,23 @@
 #: Description : volume
 #: Options : distribuicao utilizada - gnu/linux debian
 
+# sistema de arquivo que esta sendo utilizado
+#
+$ docker system info | grep Storage
+
+# arquivo de configuração do docker
+#
+$ cat /etc/docker/daemon.json
+
+# Volume
+#
+$ docker volume COMMAND
+    create
+    inspect
+    ls
+    prune
+    rm
+
 # VOLUME
 #
 $ docker volume create [HOST_VOLUME_NAME] ; criar um volume local
@@ -14,8 +31,97 @@ $ docker volume rm -f [HOST_VOLUME_NAME] ; forcar a remocao do volume
 #
 $ docker container run -ti --mount type=volume,src=[VOLUME_NAME],dst=/[CONTAINER_DIR_NAME] --name [CONTAINER_NAME] [IMAGE_NAME]
 
+$ docker container run -dit -v [/DIR_ORIGEM]:[/DIR_DESTINO] --name [CONTAINER_NAME] [IMAGE_NAME]
+$ docker container run -dit -v [/DIR_HOST]:[/DIR_CONTAINER] --name [CONTAINER_NAME] [IMAGE_NAME]
+{
+    $ docker container run -dit --name servidor -v /srv:/srv debian
+    $ docker container exec servidor touch /srv/arquivo_container.txt
+    $ touch /srv/arquivo_host.txt
+    $ docker container exec ls -l /srv
+}
+
+# volume anonimo
+#
+$ docker container run --name [CONTAINER_NAME] [IMAGE_NAME] --volume [/DIR_CONTAINER]
+{
+    $ docker container run -dit --name servidor debian --volume /volume
+    $ docker volume ls
+    $ docker container inspect servidor | grep volume
+    $ docker volume ls
+    $ docker volume inspect [HASH]
+    $ sudo touch /var/lib/docker/volumes/[HASH]]/_data/arquivo2.txt
+    $ docker container exec servidor ls /volume
+}
+
+# volume nomeado
+#
+$ docker container run -dit -v [NOME_VOLUME]:[/DIR_CONTAINER] --name [CONTAINER_NAME] [IMAGE_NAME]
+{
+    $ docker container run -dit -v volume:/volume --name servidor debian
+    $ docker volume ls
+    $ ls -l /var/lib/docker/volumes/volume/_data
+}
+
 # ASSOCIAR HOST_DIR_NAME/DOCKER_DIR_NAME
 #
-$ docker container run -ti --mount type=bind,src=[HOST_VOLUME_NAME],dst=/[CONTAINER_DIR_NAME] --name [CONTAINER_NAME] [IMAGE_NAME] ; 
-$ docker container run -ti --mount type=bind,src=[HOST_VOLUME_NAME],dst=/[CONTAINER_DIR_NAME],rw --name [CONTAINER_NAME] [IMAGE_NAME] ; ro
-$ docker container run -ti --mount type=bind,src=[HOST_VOLUME_NAME],dst=/[CONTAINER_DIR_NAME],ro --name [CONTAINER_NAME] [IMAGE_NAME] ; rw
+$ docker container run -dti --mount source=[HOST_VOLUME_NAME],target=/[CONTAINER_DIR_NAME] --name [CONTAINER_NAME] [IMAGE_NAME] ; 
+$ docker container run -dti --mount source=[HOST_VOLUME_NAME],target=/[CONTAINER_DIR_NAME],rw --name [CONTAINER_NAME] [IMAGE_NAME] ; ro
+$ docker container run -dti --mount source=[HOST_VOLUME_NAME],target=/[CONTAINER_DIR_NAME],ro --name [CONTAINER_NAME] [IMAGE_NAME] ; rw
+
+# Apagar volume
+#
+$ docker volume rm [NOME_VOLUME]
+{
+    docker volume rm volume2
+}
+
+# TMPFS - temporaries File Storage
+#
+# volume criado na memória RAM
+$ docker container run -dit --mount type=[TIPO],destination=[/DIR_CONTAINER] --name [CONTAINER_NAME] [IMAGE_NAME]
+$ docker container run -dit --tmpfs [/DIR_CONTAINER] --name [CONTAINER_NAME] [IMAGE_NAME]
+{
+    $ docker container run -dit --mount type=tmpfs,destination=/app --name tmpfstest1 debian
+    $ docker container inspect tmpfstest1 --format '{{json .Mounts}}'| jq
+    [
+        {
+            "Type": "tmpfs",
+            "Source": "",
+            "Destination": "/app",
+            "Mode": "",
+            "RW": true,
+            "Propagation": ""
+        }
+    ]
+    $ docker container exec tmpfstest1 df -h                                       
+    Filesystem                  Size  Used Avail Use% Mounted on
+    tmpfs                       494M     0  494M   0% /app
+
+    $ docker container run -dit --tmpfs /app --name tmpfstest2 debian
+    $ docker container inspect tmpfstest2 --format '{{json .HostConfig.Tmpfs}}'| jq   
+    {
+        "/app": ""
+    }
+}
+
+# alterando o tamanho do TMPFS
+#
+$ docker container run -dit --mount type=tmpfs,destination=[/DIR_CONTAINER].tmpfs-size=[TAMANHO] --name [CONTAINER_NAME] [IMAGE_NAME]
+{
+    $ docker container run -dit --mount type=tmpfs,destination=/app.tmpfs-size=100M --name tmpfstest1 debian
+    $ docker container inspect tmpfstest1 --format '{{json .HostConfig.Mounts}}'| jq
+    [
+        {
+            "Type": "tmpfs",
+            "Target": "/app.tmpfs-size=100M"
+        }
+    ]
+}
+
+# backup de volume
+#
+$ $ docker container run -dit --volumes-from [CONTAINER_ORIGEM] --name [CONTAINER_NAME] [IMAGE_NAME]
+{
+    $ docker container run -dit -v /webdata --name webserver debian                                         
+    $ docker container run -dit --volumes-from webserver --name volumetest debian
+}
