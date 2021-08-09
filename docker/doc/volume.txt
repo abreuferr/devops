@@ -125,3 +125,79 @@ $ $ docker container run -dit --volumes-from [CONTAINER_ORIGEM] --name [CONTAINE
     $ docker container run -dit -v /webdata --name webserver debian                                         
     $ docker container run -dit --volumes-from webserver --name volumetest debian
 }
+
+#
+# DOCKER PLUG-IN - SSHFS
+#
+
+# Instalação
+#
+$ docker plugin install vieux/sshfs
+
+# Listar o plugin instalado
+#
+$ docker plugin ls
+
+# criar volume
+#
+$ docker volume create [NOME_VOLUME]
+{
+    $ docker volume create nomeVolume
+    # docker02
+    $ mkdir volumeremoto
+    $ toutch volumeremoto/teste_volume.txt
+    # docker01
+    $ docker volume create -d vieux/sshfs --name sshvolume -o sshcmd=cferreira@192.168.122.14:/home/cferreira/volumeremoto -o password=SENHA
+    $ docker volume ls
+    DRIVER               VOLUME NAME
+    vieux/sshfs:latest   sshvolume
+    $ docker volume inspect sshvolume | jq                                                                                      
+    [
+        {
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Driver": "vieux/sshfs:latest",
+            "Labels": {},
+            "Mountpoint": "/mnt/volumes/a6026fe781de29df40d8715b3e503e2a",
+            "Name": "sshvolume",
+            "Options": {
+                "password": "SENHA",
+                "sshcmd": "cferreira@192.168.122.14:/volumeremoto"
+            },
+            "Scope": "local"
+        }
+    ]
+    # docker01
+    $ docker container run --rm -v sshvolume:/data alpine ls /data                                                                              
+    teste_volume.txt
+}
+
+#
+# DOCKER PLUG-IN - NFS
+#
+
+# Instalação - NFS Server
+#
+
+# docker02 (configuracao inicial)
+#
+$ sudo apt install nfs-server
+$ sudo cat /etc/exports
+    /home/cferreira/volumeremoto 192.168.122.0/24(rw)
+$ sud systemctl restart nfs-server
+$ showmount -e
+
+# docker01 (configuracao inicial)
+#
+$ sudo apt install nfs-common -y -d
+$ sudo showmount -e 192.168.122.14
+$ docker plugin install trajano/nfs-volume-plugin
+
+# docker01 (montando o volume)
+#
+$ docker volume create -d trajano/nfs-volume-plugin --opt device=192.168.122.14:/home/cferreira/volumeremoto --opt=nfsopts=hard,proto=tcp,nfsvers=3,intr,nolock volume_nfs
+$ docker volume ls
+    DRIVER                             VOLUME NAME
+    vieux/sshfs:latest                 sshvolume
+    trajano/nfs-volume-plugin:latest   volume_nfs
+
+$ docker container run -dit -v volume_nfs:/usr/share/nginx/html -p 80:80 --name webserver nginx
