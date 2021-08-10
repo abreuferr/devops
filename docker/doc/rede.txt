@@ -13,6 +13,12 @@
   prune       Remove all unused networks
   rm          Remove one or more networks
 
+# Porta
+#
+docker container run [OPCAO]-dit -p [PORTA_HOST]:[PORTA_CONTAINER] --name [CONTAINER_NOME] [IMAGEM_NOME]]
+{
+  docker container run -dit -p 80:80 --name webserver nginx
+}
 
 # BRIDGE (DEFAULT)
 #
@@ -21,16 +27,155 @@
 # mas quando eh criado uma rede e os containers sao inseridos nessa rede, entao eles passam a se enxergar.
 #
 $ docker network ls ; exibir as redes existentes
-$ docker network create -d bridge [NETWORK-NAME] ; criacao de uma rede do tipo bridge
-$ docker network inspect [NETWORK-NAME] ; obter informacoes das rede
-$ docker container [OPCAO] --name [CONTAINER-NAME] --network [NETWORK-NAME] [IMAGE-NAME] ; criar um container e adicionar o mesmo em uma rede
-$ docker network rm [NETWORK-NAME] ; apagar a rede criada
+{
+  docker network ls
+    NETWORK ID     NAME      DRIVER    SCOPE
+    c22b534e5c98   bridge    bridge    local
+    f627ef0a00c7   host      host      local
+    bb420da48223   none      null      local
+}
+$ docker network inspect [NETWORK_NOME] ; obter informacoes das rede
+{
+  docker network inspect bridge
+}
+$ docker container [OPCAO] --network [NETWORK_NOME] --name [CONTAINER_NOME] [IMAGEM_NOME] ; criar um container e adicionar o mesmo em uma rede
+{
+  docker container run -dit --network bridge -p 80:80 --name webserver nginx
+  ip -c -br a                                                               
+    docker0          UP             172.17.0.1/16 fe80::42:81ff:feaf:94e6/64 
+    veth302b153@if12 UP             fe80::54d4:dbff:fef6:2fe4/64 
+}
+
+# rede bridge não fornece resolução de dns
+{
+  $ docker container run -dit -h servidor --name container1 debian     
+  $ docker container run -dit -h cliente --name container2 debian
+  $ docker container exec container1 ip -c a show eth0           
+    inet 172.17.0.2/16 brd 172.17.255.255 scope global eth0
+  $ docker container exec container2 ip -c a show eth0
+    inet 172.17.0.3/16 brd 172.17.255.255 scope global eth0
+  $ ip -c -br a show docker0
+    docker0          UP             172.17.0.1/16 fe80::42:81ff:feaf:94e6/64
+  $ docker container exec container2 ping -c4 172.17.0.3
+    PING 172.17.0.3 (172.17.0.3) 56(84) bytes of data.
+    64 bytes from 172.17.0.3: icmp_seq=1 ttl=64 time=0.041 ms
+    64 bytes from 172.17.0.3: icmp_seq=2 ttl=64 time=0.046 ms
+    64 bytes from 172.17.0.3: icmp_seq=3 ttl=64 time=0.044 ms
+    64 bytes from 172.17.0.3: icmp_seq=4 ttl=64 time=0.077 ms
+
+  $ docker container exec container1 ping -c4 172.17.0.2
+    PING 172.17.0.2 (172.17.0.2) 56(84) bytes of data.
+    64 bytes from 172.17.0.2: icmp_seq=1 ttl=64 time=0.042 ms
+    64 bytes from 172.17.0.2: icmp_seq=2 ttl=64 time=0.059 ms
+    64 bytes from 172.17.0.2: icmp_seq=3 ttl=64 time=0.065 ms
+    64 bytes from 172.17.0.2: icmp_seq=4 ttl=64 time=0.061 ms
+}
+
+{
+  $ docker container run -dit -h servidor --name container1 debian    
+  $ docker container run -dit -h cliente --link container1:servidor --name container2 debian
+  $ docker container exec container2 ping -c4 container1                                   
+    PING servidor (172.17.0.2) 56(84) bytes of data.
+    64 bytes from servidor (172.17.0.2): icmp_seq=1 ttl=64 time=0.159 ms
+    64 bytes from servidor (172.17.0.2): icmp_seq=2 ttl=64 time=0.108 ms
+    64 bytes from servidor (172.17.0.2): icmp_seq=3 ttl=64 time=0.106 ms
+    64 bytes from servidor (172.17.0.2): icmp_seq=4 ttl=64 time=0.111 ms
+}
+
+$ docker network rm [NETWORK_NOME] ; apagar a rede criada
+
+# USER-DEFINED BRIDGE
+#
+# - dns automático
+# - melhor isolamento
+# - conectar e desconectar container on-the-fly
+# - são configuraveis e personalizaveis
+#
+
+$ docker network create --driver bridge --subnet [NETMASK] [NETWORK_NOME] ; criacao de uma rede do tipo bridge
+{
+  $ docker network create --driver bridge --subnet 172.20.0.0/16 dca-lan
+  $ docker network ls                                
+    NETWORK ID     NAME      DRIVER    SCOPE
+    46cab3ae8eb5   dca-lan   bridge    local
+}
+
+$ docker network inspect [NETWORK_NOME] ; visualizar as informações da rede criada
+
+$ docker container run [OPCAO] --name [CONTAINER-NAME] -h [CONTAINER_HOST_NAME] --network=[NETWORK-NAME] [IMAGEM_NOME] ; conectar um container a uma rede durante a inicializacao do mesmo.
+{
+  $ docker container run -dit --name container1 -h servidor --network dca-lan debian
+  $ docker container run -dit --name container2 -h cliente --network dca-lan debian
+
+  $ docker container exec container2 ping -c1 cliente                              
+    PING cliente (172.20.0.3) 56(84) bytes of data.
+    64 bytes from cliente (172.20.0.3): icmp_seq=1 ttl=64 time=0.140 ms
+
+  $ docker container exec container2 ping -c1 container1
+    PING container1 (172.20.0.2) 56(84) bytes of data.
+    64 bytes from container1.dca-lan (172.20.0.2): icmp_seq=1 ttl=64 time=0.165 ms
+}
+
+$ docker network disconnect [NETWORK-NAME] [CONTAINER-NAME] ; desconectar um container a uma rede.
+{
+  $ docker network disconnect dca-lan container2
+}
+
+$ docker network connect [NETWORK-NAME] [CONTAINER-NAME] ; conectar um container a uma rede.
+$ docker network connect --ip [CONTAINER_IP] [NETWORK-NAME] [CONTAINER-NAME] ; conectar um container a uma rede e defir o endereço IP do container
+{
+  $ docker network connect dca-lan container2
+  $ docker network connect --ip 172.20.0.200 dca-lan container2
+}
+
+docker container run -dit --dns [IP_DNS] --name [CONTAINER_NOME] [IMAGEM]
+{
+  docker container run -dit --dns 8.8.8.8 --name container1 debian
+}
+
+# Alterar o DNS do container
+$ sudo cat /etc/docker/daemon.json                       
+{
+	"dns": ["8.8.8.8", "8.8.4.4"]
+}
+$ docker container run -dit --name container1 debian
+$ docker container exec -ti container1 cat /etc/resolv.conf
+  nameserver 8.8.8.8
+  nameserver 8.8.4.4
+
+$ docker network rm [NETWORK-NAME]
+{
+  $ docker network rm dca-lan
+}
 
 # HOST
 #
 # nesse tipo de rede, eh removido o isolamento em termos de rede entre o container e o Docker host
+# conexao direta - host_ip = container_ip
+# não é necessário publicar porta
 #
-$ docker container run [OPCAO] --network host --name [CONTAINER-NAME] [IMAGEM-NAME]
+$ docker container run [OPCAO] --network host --name [CONTAINER_NOME] [IMAGEM_NOME]
+{
+  docker container run -dit --network host --name webserver nginx
+}
+
+# NONE
+#
+# não existe conexão de rede nesse tipo de container
+$ docker container run [OPCAO] --network none --name [CONTAINER_NOME] [IMAGEM_NOME]
+{
+  docker container run -dit --network none --name sem_rede alpine ash
+  docker container exec sem_rede ip link show                        
+    1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+}
+
+# MACVLAN
+#
+# assinar um endereco MAC ao container
+# 
+$ docker network create -d macvlan --subnet=[NETWORK/CIDR] --gateway=[GATEWAY-IP] -o parent=[HOST-NETWORK-INTERFACE] [NETWORK-NAME] ; criar um rede do tipo overlay, definindo a subnet, endereco do gateway e interface de rede 
+$ docker container run [OPCAO] --network [NETWORK-NAME] --name [CONTAINER-NAME] [IMAGE-NAME]:[VERSAO] ; criar um container e adicionando ele na rede criada acima
 
 # OVERLAY
 #
@@ -41,21 +186,4 @@ $ docker network create --drive=overlay [NETWORK-NAME] ; criar de uma do tipo ov
 (...) ; criacao de um cluster swarm
 
 $ docker service create --name [SERVICE-NAME] --replicas=[REPLICA-NUMBER] --networki=[NETWORK-NAME] [IMAGE-NAME] ; criar um servico e adicionar esse servico em uma determinada rede
-$ docker container run [OPCAO] --network=[NETWORK-NAME] [IMAGE-NAME]:[VERSAO] ; criar um container e anexar esse container em uma determinada rede
 $ docker service update --network-add [NEW-NETWORK-NAME] --network-rm [OLD-NETWORK-NAME] [CONTAINER-NAME] ; mover um container de uma rede para outra
-$ docker network rm [NETWORK-NAME]
-
-# MACVLAN
-#
-# assinar um endereco MAC ao container
-# 
-$ docker network create -d macvlan --subnet=[NETWORK/CIDR] --gateway=[GATEWAY-IP] -o parent=[HOST-NETWORK-INTERFACE] [NETWORK-NAME] ; criar um rede do tipo overlay, definindo a subnet, endereco do gateway e interface de rede 
-
-$ docker container run [OPCAO] --network [NETWORK-NAME] --name [CONTAINER-NAME] [IMAGE-NAME]:[VERSAO] ; criar um container e adicionando ele na rede criada acima
-
-# GERAL
-#
-$ docker network connect [NETWORK-NAME] [CONTAINER-NAME] ; conectar um container a uma rede.
-$ docker network disconnect [NETWORK-NAME] [CONTAINER-NAME] ; desconectar um container a uma rede.
-$ docker container run [OPCAO] --network=[NETWORK-NAME] [CONTAINER-NAME] ; conectar um container a uma rede durante a inicializacao do mesmo.
-$ docker run -p [HOST-PORT]:[CONTAINER-PORT] --name [CONTAINER-NAME] -t [IMAGE-NAME] ; exportar uma porta
