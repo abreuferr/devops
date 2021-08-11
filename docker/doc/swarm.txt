@@ -3,35 +3,54 @@
 #: Description : Dcoker Machine e Swarm
 #: Options : distribuicao utilizada - gnu/linux debian
 
-###
-# DOCKER
-###
-
-# INSTALACAO
 #
-# o docker deve ser instalado em todos os hosts do cluster swam
-#
-$ sudo apt-get update
-$ sudo apt-get upgrade
-$ sudo apt-get install curl
-$ sudo curl -sSL https://get.docker.com/ | sh
-$ sudo usermod -aG docker [USUARIO]
-
-
-###
 # SWARM
-###
+#
 
 $ docker swarm init --advertise-addr [MANAGER-IP] ; inicalizar o cluster swarm
-$ docker swarm join-token manager ; comando utilizado para exibir o comando utilizado para adicionar master no swarm
+{
+    $ docker swarm init --advertise-addr 192.168.122.18
+    Swarm initialized: current node (ryucc6a6xd6jjofulgzagfx89) is now a manager.
+
+    To add a worker to this swarm, run the following command:
+
+    docker swarm join --token SWMTKN-1-3e78mevx1whtgowvhy3dz362n13z7eirof2b0j0v75x6tbrmhl-92h79cow1f1lsaqmd4pxjs35x 192.168.122.18:2377
+
+    To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
+}
+
+$ docker swarm join --token [TOKEN] [IP]:[PORTA] ; comando utilizado para adicionar um nó ao cluster swarm
+{
+    docker swarm join --token SWMTKN-1-3e78mevx1whtgowvhy3dz362n13z7eirof2b0j0v75x6tbrmhl-92h79cow1f1lsaqmd4pxjs35x 192.168.122.18:2377
+}
+
+$ docker swarm join-token manager ; comando utilizado para exibir o comando utilizado para adicionar manager no swarm
+{
+    $ docker swarm join-token manager
+    To add a manager to this swarm, run the following command:
+
+    docker swarm join --token SWMTKN-1-3e78mevx1whtgowvhy3dz362n13z7eirof2b0j0v75x6tbrmhl-8h2hynbluag5f7x2f4zyqz3vg 192.168.122.18:2377
+}
+
 $ docker swarm join-token worker ; comando utilizado para exibir o comando utilizado para adicionar worker no swarm
+{
+    $ docker swarm join --token SWMTKN-1-3e78mevx1whtgowvhy3dz362n13z7eirof2b0j0v75x6tbrmhl-92h79cow1f1lsaqmd4pxjs35x 192.168.122.18:2377
+}
+
 $ docker swarm leave ; comando utilizado para remover o node do cluster swarm
 
-###
+#
 # NODE
-###
+#
 
 $ docker node ls ; listar o nodes do cluster
+{
+    $ docker node ls                                   
+    ID                            HOSTNAME   STATUS    AVAILABILITY   MANAGER STATUS   ENGINE VERSION
+    ryucc6a6xd6jjofulgzagfx89 *   manager    Ready     Active         Leader           20.10.8
+    kf9bnxkdex03mns3qeocjcvhs     node01     Ready     Active                          20.10.8
+    lapr60zg96mqk0u9sxqieqvh0     node02     Ready     Active                          20.10.8
+}
 $ docker node ps ; listar as tarefas que estao sendo executadas nos nodes
 $ docker node rm [NODE-NAME]; remover o host do cluster 
 $ docker node inspect [NODE-NAME] ; obter informacao sobre um determinado node do cluster swarm
@@ -41,12 +60,30 @@ $ docker node --role manager [NODE-NAME] ; torna o node um manager
 $ docker node update --availability drain [NODE-NAME] ; desativar determinado node do cluster swarm
 $ docker node update --availability active [NODE-NAME] ; ativar determinado node do cluster swarm
 $ docker node update --availability pause [NODE-NAME] ; pausar determinado node do cluster swarm
-$ docker node promote [NODE_NAME] ; promover o host de worker para manager
-$ docker node demote [NODE_NAME] ; rebaixar o host de manager para worker
 
-##
+$ docker node promote [NODE_NAME] ; promover o host de worker para manager
+{
+    $ docker node promote node01    
+    Node node01 promoted to a manager in the swarm.
+    $ docker node ls            
+    ID                            HOSTNAME   STATUS    AVAILABILITY   MANAGER STATUS   ENGINE VERSION
+    ryucc6a6xd6jjofulgzagfx89 *   manager    Ready     Active         Leader           20.10.8
+    kf9bnxkdex03mns3qeocjcvhs     node01     Ready     Active         Reachable        20.10.8
+}
+
+$ docker node demote [NODE_NAME] ; rebaixar o host de manager para worker
+{
+    $ docker node demote node01
+    Manager node01 demoted in the swarm.
+    $ docker node ls           
+    ID                            HOSTNAME   STATUS    AVAILABILITY   MANAGER STATUS   ENGINE VERSION
+    ryucc6a6xd6jjofulgzagfx89 *   manager    Ready     Active         Leader           20.10.8
+    kf9bnxkdex03mns3qeocjcvhs     node01     Ready     Active                          20.10.8
+}
+
+#
 # SERVICO
-##
+#
 
 $ docker service create [OPCAO]--replicas [REPLICA-NUMBER] --name [SERVICE-NAME] [IMAGE-NAME]:[VERSION] ; criacao de um servico
 $ docker service ls ; listar os servicos que estao ativos

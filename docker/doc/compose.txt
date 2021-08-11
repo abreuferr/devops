@@ -47,3 +47,8 @@ $ docker-compose -f [COMPOSE_FILE.YML] logs -f
 {
     docker-compose -f wordpress-compose.yml logs
 }
+
+$ docker-compose scale [DOCKER_NAME]=[NUMERO]
+{
+    $ docker-compose scale webserver=10
+}
