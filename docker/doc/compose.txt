@@ -1,12 +1,49 @@
 #: Title : Docker Compose
 #: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
-#: Description : treinamento dia 05 - Docker Compose
+#: Description : treinamento dia 05 - Docker Compose - Caio Delgado
 #: Options : distribuicao utilizada - gnu/linux debian
 
-##
-# DOCKER COMPOSE
-##
-
-# INSTALACAO
 #
-$ sudo curl -L https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose && sudo chmod +x /usr/local/bin/docker-compose
+# 3 Passos
+#
+
+1 - define o ambiente com um dockerfile, para uma melhor reprodução.
+2 - define os serviços que serão executados no arquivo docker-compose.yml
+3 - executa o comando dicker compose up
+
+#
+# Geral
+#
+
+# version - define a versão do arquivo compose
+# services - define uma seção para os serviços
+# build - define o local do Dockerfile
+# hostname - define o hostnamedo container
+# ports - define quais portas serão publicadas
+# restart - define uma politica de restart do container
+
+# executar
+$ docker-compose up -d
+$ docker-compose down
+
+$ docker-compose start
+$ docker-compose stop
+
+$ docker-compose -f [COMPOSE_FILE.YML] up -d
+{
+    $ docker-compose -f wordpress-compose.yml up -d
+}
+
+$ docker-compose -f [COMPOSE_FILE.YML] ps
+{
+    docker-compose -f wordpress-compose.yml ps   
+        Name                      Command               State                Ports              
+    -----------------------------------------------------------------------------------------------
+    compose_db_1          docker-entrypoint.sh mysqld      Up      3306/tcp, 33060/tcp             
+    compose_wordpress_1   docker-entrypoint.sh apach ...   Up      0.0.0.0:80->80/tcp,:::80->80/tcp
+}
+
+$ docker-compose -f [COMPOSE_FILE.YML] logs -f
+{
+    docker-compose -f wordpress-compose.yml logs
+}
