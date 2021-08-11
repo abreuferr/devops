@@ -1,0 +1,14 @@
+# docker run -dit --name webserver --hostname webserver -p 80:80 image_webserver
+
+version: "3.9"
+services:
+  webserver:
+    image: caiodelgadonew/webserver:apache2
+    hostname: webserver
+    deploy:
+      replicas: 2
+    #ports: 
+    #- 80:80
+    restart: always
+    volumes: 
+      - $PWD/html:/var/www/html

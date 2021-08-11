@@ -1,0 +1,42 @@
+# docker volume create mysql_db
+# docker network create wordpress_net
+# docker container run --name wordpress -p 80:80 -e WORDPRESS_DB_HOST=db -e WORDPRESS_DB_USER=wpuser -e WORDPRESS_DB_PASSWORD=caiodelgadonew@youtube -e WORDPRESS_DB_NAME=wordpress  wordpress
+# docker container run --hostname db -p 3306:3306 -v mysql_db:/var/lib/mysql -e MYSQL_DATABASE=wordpress -e MYSQL_USER=wpuser -e MYSQL_PASSWORD=caiodelgadonew@youtube -e MYSQL_RANDOM_ROOT_PASSWORD='1' mysql:5.7
+#
+# -----------------------------------------------
+version: '3'
+
+volumes:
+  mysql_db:
+
+networks:
+  wordpress_net:
+
+services:
+  wordpress:
+    image: wordpress
+    restart: always
+    ports:
+      - 80:80
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wpuser
+      WORDPRESS_DB_PASSWORD: AAaa00--
+      WORDPRESS_DB_NAME: wordpress 
+    networks:
+      - wordpress_net
+    depends_on:
+      - db
+
+  db: 
+    image: mysql:5.7
+    restart: always
+    volumes:
+      - mysql_db:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wpuser
+      MYSQL_PASSWORD: AAaa00--
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    networks:
+      - wordpress_net
