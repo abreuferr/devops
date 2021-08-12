@@ -226,7 +226,7 @@ $ docker service create --name [SERVICE-NAME] --network [NETWORK-NAME] -p 8080:8
 # criar e adicionar um servico em uma determinada rede e remover de outra rede
 $ docker service create --name [SERVICE-NAME] --network-rm [NETWORK-NAME] --network-add [NETWORK-NAME] --replicas [QTDADE-REPLICA] [IMAGE-NAME]:[VERSION]
 
-# SERICE + IMAGEM
+# SERVICE + IMAGEM
 #
 
 # upgrade/downgrade de uma imagem em um servico
