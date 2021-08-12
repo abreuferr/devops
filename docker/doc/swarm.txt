@@ -7,7 +7,8 @@
 # SWARM
 #
 
-$ docker swarm init --advertise-addr [MANAGER-IP] ; inicalizar o cluster swarm
+# inicalizar o cluster swarm
+$ docker swarm init --advertise-addr [MANAGER-IP]
 {
     $ docker swarm init --advertise-addr 192.168.122.18
     Swarm initialized: current node (ryucc6a6xd6jjofulgzagfx89) is now a manager.
@@ -19,12 +20,8 @@ $ docker swarm init --advertise-addr [MANAGER-IP] ; inicalizar o cluster swarm
     To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
 }
 
-$ docker swarm join --token [TOKEN] [IP]:[PORTA] ; comando utilizado para adicionar um nó ao cluster swarm
-{
-    docker swarm join --token SWMTKN-1-3e78mevx1whtgowvhy3dz362n13z7eirof2b0j0v75x6tbrmhl-92h79cow1f1lsaqmd4pxjs35x 192.168.122.18:2377
-}
-
-$ docker swarm join-token manager ; comando utilizado para exibir o comando utilizado para adicionar manager no swarm
+# comando utilizado para exibir o comando utilizado para adicionar manager no swarm
+$ docker swarm join-token manager
 {
     $ docker swarm join-token manager
     To add a manager to this swarm, run the following command:
@@ -32,9 +29,16 @@ $ docker swarm join-token manager ; comando utilizado para exibir o comando util
     docker swarm join --token SWMTKN-1-3e78mevx1whtgowvhy3dz362n13z7eirof2b0j0v75x6tbrmhl-8h2hynbluag5f7x2f4zyqz3vg 192.168.122.18:2377
 }
 
-$ docker swarm join-token worker ; comando utilizado para exibir o comando utilizado para adicionar worker no swarm
+# comando utilizado para exibir o comando utilizado para adicionar worker no swarm
+$ docker swarm join-token worker 
 {
     $ docker swarm join --token SWMTKN-1-3e78mevx1whtgowvhy3dz362n13z7eirof2b0j0v75x6tbrmhl-92h79cow1f1lsaqmd4pxjs35x 192.168.122.18:2377
+}
+
+# comando utilizado para adicionar um nó ao cluster swarm
+$ docker swarm join --token [TOKEN] [IP]:[PORTA]
+{
+    docker swarm join --token SWMTKN-1-3e78mevx1whtgowvhy3dz362n13z7eirof2b0j0v75x6tbrmhl-92h79cow1f1lsaqmd4pxjs35x 192.168.122.18:2377
 }
 
 $ docker swarm leave ; comando utilizado para remover o node do cluster swarm
@@ -82,34 +86,158 @@ $ docker node demote [NODE_NAME] ; rebaixar o host de manager para worker
 }
 
 #
+# Registry
+#
+
+# executar o comando abaixo em todos os servidores do cluster
+#
+$ echo '{ "insecure-registries" : ["registry:5000"] }' | sudo tee /etc/docker/daemon.json ; sudo systemctl restart docker
+
+# registry
+$
+$ docker container run -dit -p 5000:5000 --name registry registry:2
+$ docker pull alpine
+$ docker image tag alpine registry:5000/alpine
+$ docker image ls                             
+    REPOSITORY             TAG       IMAGE ID       CREATED        SIZE
+    alpine                 latest    021b3423115f   4 days ago     5.6MB
+    registry:5000/alpine   latest    021b3423115f   4 days ago     5.6MB
+    registry               2         1fd8e1b0bb7e   3 months ago   26.2MB
+$ docker push registry:5000/alpine
+    Using default tag: latest
+    The push refers to repository [registry:5000/alpine]
+    bc276c40b172: Pushed 
+    latest: digest: sha256:be9bdc0ef8e96dbc428dc189b31e2e3b05523d96d12ed627c37aa2936653258c size: 528
+$ curl http://registry:5000/v2/_catalog                                                                                         
+    {"repositories":["alpine"]}
+
+$ cat imagens.sh
+    for image in 'nginx' 'mysql:5.7' 'wordpress' 'caiodelgadonew/docker-supermario' 'traefik:v2.4'
+    do
+    docker image pull $image
+    docker tag $image registry:5000/$image
+    docker push registry:5000/$image
+    done
+
+$ chmod +x imagens.sh
+$ ./imagens.sh
+
+#
 # SERVICO
 #
 
-$ docker service create [OPCAO]--replicas [REPLICA-NUMBER] --name [SERVICE-NAME] [IMAGE-NAME]:[VERSION] ; criacao de um servico
-$ docker service ls ; listar os servicos que estao ativos
-$ docker service ps [SERVICE-NAME] ; obter informacao sobre o servico
-$ docker service scale [SERVICE-NAME]=[REPLICA-NUMBER] ; replicar o servico para N nodes do cluster swarm
-$ docker service rm [SERVICE-NAME] ; apagar um determinado servico
+# criacao de um servico
+$ docker service create [OPCAO]--replicas [REPLICA-NUMBER] --name [SERVICE-NAME] [IMAGE-NAME]:[VERSION]
+{
+    $ docker service create --name webserver registry:5000/nginx
+}
+
+# listar os servicos que estao ativos
+$ docker service ls
+{
+    $ docker service ls           
+        ID             NAME         MODE         REPLICAS   IMAGE                        PORTS
+        bgoe22vrmm91   webserver    replicated   1/1        registry:5000/nginx:latest   
+}
+
+# obter informacao sobre o servico
+$ docker service ps [SERVICE-NAME]
+{
+    $ docker service ps webserver                               
+        ID             NAME           IMAGE                        NODE      DESIRED STATE   CURRENT STATE               ERROR     PORTS
+        sfl9f2cthd2x   webserver.1    registry:5000/nginx:latest   node01    Running         Running about an hour ago             
+
+    $ docker service ps webserver 
+    ID             NAME              IMAGE                        NODE       DESIRED STATE   CURRENT STATE            ERROR     PORTS
+    1rptvwmd12g6   webserver.1       registry:5000/nginx:latest   registry   Running         Running 3 minutes ago              
+    vk75crqplnw8    \_ webserver.1   registry:5000/nginx:latest   node02     Shutdown        Shutdown 3 minutes ago         
+}
+
+# atualizar o serviço
+$ docker service update --publish-add [PORTA] [SERVICE_NAME]
+{
+    $ docker service update --publish-add 80 webserver
+    webserver
+    overall progress: 1 out of 1 tasks 
+    1/1: running   [==================================================>] 
+    verify: Service converged 
+
+    $ docker service ls                               
+    ID             NAME        MODE         REPLICAS   IMAGE                        PORTS
+    sdj3jeqzohc5   webserver   replicated   1/1        registry:5000/nginx:latest   *:30000->80/tcp
+}
+
+# aumentar o número de replicas
+$ docker service update --replicas [NUMERO_REPLICA] [SERVICE_NAME]
+}
+    $ docker service update --replicas 10 webserver   
+    webserver
+    overall progress: 10 out of 10 tasks 
+    1/10: running   [==================================================>] 
+    2/10: running   [==================================================>] 
+    3/10: running   [==================================================>] 
+    4/10: running   [==================================================>] 
+    5/10: running   [==================================================>] 
+    6/10: running   [==================================================>] 
+    7/10: running   [==================================================>] 
+    8/10: running   [==================================================>] 
+    9/10: running   [==================================================>] 
+    10/10: running   [==================================================>] 
+    verify: Service converged 
+}
+
+# replicar o servico para N nodes do cluster swarm
+$ docker service scale [SERVICE-NAME]=[REPLICA-NUMBER]
+{
+    $ docker service scale webserver=3
+}
+
+# apagar um determinado servico
+$ docker service rm [SERVICE-NAME]
+{
+    $ docker service rm webserver
+    webserver
+}
 
 # SERVICO [REPLICATED] + VOLUME
 #
-$ docker volume create [VOLUME-NAME] ; criacao de um volume
-$ docker service create --name [SERVICE-NAME] --replicas [QTDADE-REPLICA] -p 8080:80 --mount type=volume,src=[VOLUME-NAME],dst=/[DIR-VOLUNE-NAME] [IMAGE-NAME]:[VERSION] ; criacao de um servico com um determinado servico
-$ docker service update --mount-add type=volume,src=[VOLUME-NAME],dst=[CONTAINER-DIR] [SERVICE-NAME] ; adicionar um volume a um servico
+
+# criacao de um volume
+$ docker volume create [VOLUME-NAME]
+
+# criacao de um servico com um determinado servico
+$ docker service create --name [SERVICE-NAME] --replicas [QTDADE-REPLICA] -p 8080:80 --mount type=volume,src=[VOLUME-NAME],dst=/[DIR-VOLUNE-NAME] [IMAGE-NAME]:[VERSION]
+
+# adicionar um volume a um servico
+$ docker service update --mount-add type=volume,src=[VOLUME-NAME],dst=[CONTAINER-DIR] [SERVICE-NAME]
 
 # SERVICO + REDE
 #
-$ docker network create --driver overlay [NETWORK-NAME] ; criacao de uma rede do tipo overlay
-$ docker service create --name [SERVICE-NAME] --network [NETWORK-NAME] --replicas [QTDADE-REPLICA] [IMAGE-NAME]:[VERSION] ; criar e adicionar um servico em uma determinada rede
-$ docker service create --name [SERVICE-NAME] --network [NETWORK-NAME] -p 8080:80 --mode global [IMAGE-NAME]:[VERSION] ; servico do tipo globa implica que esse servico sera replicato para todos os nodes do cluster
-$ docker service create --name [SERVICE-NAME] --network-rm [NETWORK-NAME] --network-add [NETWORK-NAME] --replicas [QTDADE-REPLICA] [IMAGE-NAME]:[VERSION] ; criar e adicionar um servico em uma determinada rede e remover de outra rede
+
+# criacao de uma rede do tipo overlay
+$ docker network create --driver overlay [NETWORK-NAME]
+
+# criar e adicionar um servico em uma determinada rede
+$ docker service create --name [SERVICE-NAME] --network [NETWORK-NAME] --replicas [QTDADE-REPLICA] [IMAGE-NAME]:[VERSION]
+
+# servico do tipo globa implica que esse servico sera replicato para todos os nodes do cluster
+$ docker service create --name [SERVICE-NAME] --network [NETWORK-NAME] -p 8080:80 --mode global [IMAGE-NAME]:[VERSION]
+
+# criar e adicionar um servico em uma determinada rede e remover de outra rede
+$ docker service create --name [SERVICE-NAME] --network-rm [NETWORK-NAME] --network-add [NETWORK-NAME] --replicas [QTDADE-REPLICA] [IMAGE-NAME]:[VERSION]
 
 # SERICE + IMAGEM
 #
-$ docker service update --image [IMAGE-NAME]:[VERSAO] [SERVICE-NAME] ; upgrade/downgrade de uma imagem em um servico
+
+# upgrade/downgrade de uma imagem em um servico
+$ docker service update --image [IMAGE-NAME]:[VERSAO] [SERVICE-NAME]
 
 # SERVICO + REDE + VOLUME
 #
-$ docker network create --driver overlay [NETWORK-NAME] ; criacao de uma rede do tipo overlay
+
+# criacao de uma rede do tipo overlay
+$ docker network create --driver overlay [NETWORK-NAME]
+
 $ docker volume create [VOLUME-NAME]
+
 $ docker service create --name [SERICE-NAME] --network [NETWORK-NAME] --mount type=volume,src=[VOLUME-NAME],dst=/[CONTAINER-DIR] -p 8080:80 --replicas [QTDATE-REPLICA] --mode replicated --hostname [HOST-NAME] --dns [DNS] --limit-memory [QTDADE-MEMORY]M --limit-cpu 0.5 --restart-condition any [IMAGE-NAME]:[VERSION]

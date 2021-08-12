@@ -1,0 +1,24 @@
+#: Title : image
+#: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
+#: Description : image
+#: Options : distribuicao utilizada - gnu/linux debian
+
+#
+# Por padrao o nome do arquivo do docker file eh o "Dockerfile", mas com o parametro -f eh possivel
+# ler do Dockerfile com outro nome.
+#
+
+$ docker image build -t [DOCKERHUB-USERNAME]/[IMAGE_NAME]:[VERSION.X] .
+$ docker image build --no-cache -f [DOCKERFILE_NAME] -t [DOCKERHUB-USERNAME]/[IMAGE_NAME]:[VERSION] . 
+$ docker image build --no-cache -f [DOCKERFILE_NAME] -t [IMAGE_NAME]:[VERSION] . 
+$ docker image build -t [IMAGE_NAME]:[VERSION] . ; criar um container
+
+###
+# DOCKERHUB
+###
+
+$ docker login -u [DOCKERHUB-USERNAME] ; login no dockerhub
+$ docker image tag [IMAGE_NAME] [DOCKERHUB_USERNAME]/[IMAGE_NAME]:[VERSION] ; mudar a tag da imagem
+$ docker image push [DOCKERHUB_USERNAME]/[IMAGE_NAME]:[VERSION] ; enviar a imagem para o dockerhub
+$ docker image pull [DOCKERHUB-USERNAME]/[IMAGE_NAME]:[VERSION] ; fazer o download da imagem no dockerhub
+$ docker logoun ; logout no dockerhub
