@@ -1,0 +1,12 @@
+version: '3.9'
+
+services:
+  webserver:
+    image: registry.docker-dca.example:5000/nginx
+    hostname: webserver
+    ports:
+      - 80:80
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure

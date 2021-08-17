@@ -1,0 +1,18 @@
+version: '3.9'
+
+services:
+  webserver:
+    image: registry:5000/nginx
+    hostname: webserver
+    ports:
+      - 80:80
+    deploy:
+      mode: replicated
+      replicas: 4
+      placement:
+        constraints:
+          - node.role==worker
+          - node.labels.os==debian
+          - node.labels.location==us-east-1
+      restart_policy:
+        condition: on-failure

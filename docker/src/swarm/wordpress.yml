@@ -1,0 +1,53 @@
+version: "3.9"
+
+volumes:
+  mysql_db:
+
+networks:
+  wp_overlay:
+
+
+services:
+  wordpress:
+    image: registry:5000/wordpress
+    ports:
+      - 8080:80
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wpuser
+      WORDPRESS_DB_PASSWORD: AAaa00--
+      WORDPRESS_DB_NAME: wordpress
+    networks:
+      - wp_overlay
+    deploy:
+      mode: replicated
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          cpus: "1"
+          memory: 60M
+        reservations:
+          cpus: "0.5"
+          memory: 30M
+
+  db:
+    image: registry:5000/mysql:5.7
+    volumes:
+      - mysql_db:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wpuser
+      MYSQL_PASSWORD: Aaaa00--
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    networks:
+       - wp_overlay
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role==manager
+      restart_policy:
+        condition: on-failure
