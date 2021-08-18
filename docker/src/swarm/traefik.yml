@@ -1,0 +1,32 @@
+version: '3.9'
+
+networks:
+  proxy:
+    external: true
+
+services:
+  traefik:
+    image: "registry.docker-dca.example:5000/traefik:v2.4"
+    command:
+      - --entrypoints.web.address=:80
+      - --providers.docker.swarmMode=true
+      - --providers.docker.exposedByDefault=false
+      - --api
+    ports:
+      - 80:80
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - proxy
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.role==manager
+      restart_policy:
+        condition: on-failure
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.traefik.rule=Host(`dashboard.docker-dca.example`)"
+        - "traefik.http.routers.traefik.service=api@internal"
+        - "traefik.http.services.traefik.loadbalancer.server.port=80"
