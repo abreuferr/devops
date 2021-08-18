@@ -55,14 +55,54 @@ $ docker node ls ; listar o nodes do cluster
     kf9bnxkdex03mns3qeocjcvhs     node01     Ready     Active                          20.10.8
     lapr60zg96mqk0u9sxqieqvh0     node02     Ready     Active                          20.10.8
 }
+
 $ docker node ps ; listar as tarefas que estao sendo executadas nos nodes
 $ docker node rm [NODE-NAME]; remover o host do cluster 
 $ docker node inspect [NODE-NAME] ; obter informacao sobre um determinado node do cluster swarm
 $ docker node update [NODE-NAME] ; atualizar as configuracoes do node
 $ docker node --role worker [NODE-NAME] ; torna o node um worker
 $ docker node --role manager [NODE-NAME] ; torna o node um manager
+
 $ docker node update --availability drain [NODE-NAME] ; desativar determinado node do cluster swarm
+{
+    $ docker node ls
+    ID                            HOSTNAME   STATUS    AVAILABILITY   MANAGER STATUS   ENGINE VERSION
+    ryucc6a6xd6jjofulgzagfx89 *   manager    Ready     Active         Leader           20.10.8
+    kf9bnxkdex03mns3qeocjcvhs     node01     Ready     Active                          20.10.8
+    lapr60zg96mqk0u9sxqieqvh0     node02     Ready     Active                          20.10.8
+    o0nwt659fjbm3fu8o0udexff6     registry   Ready     Active                          20.10.8
+ 
+    $ docker node update node01 --availability drain
+    node01
+
+    $ docker node ls                                
+    ID                            HOSTNAME   STATUS    AVAILABILITY   MANAGER STATUS   ENGINE VERSION
+    ryucc6a6xd6jjofulgzagfx89 *   manager    Ready     Active         Leader           20.10.8
+    kf9bnxkdex03mns3qeocjcvhs     node01     Ready     Drain                           20.10.8
+    lapr60zg96mqk0u9sxqieqvh0     node02     Ready     Active                          20.10.8
+    o0nwt659fjbm3fu8o0udexff6     registry   Ready     Active                          20.10.8
+}
+
 $ docker node update --availability active [NODE-NAME] ; ativar determinado node do cluster swarm
+{
+    $ docker node ls
+    ID                            HOSTNAME   STATUS    AVAILABILITY   MANAGER STATUS   ENGINE VERSION
+    ryucc6a6xd6jjofulgzagfx89 *   manager    Ready     Active         Leader           20.10.8
+    kf9bnxkdex03mns3qeocjcvhs     node01     Ready     Drain                           20.10.8
+    lapr60zg96mqk0u9sxqieqvh0     node02     Ready     Active                          20.10.8
+    o0nwt659fjbm3fu8o0udexff6     registry   Ready     Active                          20.10.8
+
+    $ docker node update node01 --availability active
+    node01
+
+    $ docker node ls                                 
+    ID                            HOSTNAME   STATUS    AVAILABILITY   MANAGER STATUS   ENGINE VERSION
+    ryucc6a6xd6jjofulgzagfx89 *   manager    Ready     Active         Leader           20.10.8
+    kf9bnxkdex03mns3qeocjcvhs     node01     Ready     Active                          20.10.8
+    lapr60zg96mqk0u9sxqieqvh0     node02     Ready     Active                          20.10.8
+    o0nwt659fjbm3fu8o0udexff6     registry   Ready     Active                          20.10.8
+}
+
 $ docker node update --availability pause [NODE-NAME] ; pausar determinado node do cluster swarm
 
 $ docker node promote [NODE_NAME] ; promover o host de worker para manager
@@ -199,6 +239,14 @@ $ docker service rm [SERVICE-NAME]
     webserver
 }
 
+# SERVICO [REPLICATED]
+#
+# criacao de um servico com um determinado número de réplicas
+$ docker service create --name [SERVICE-NAME] --replicas [QTDADE-REPLICA] [IMAGE-NAME]:[VERSION]
+{
+    $ docker service create --name ping_test --replicas 3 alpine
+}
+
 # SERVICO [REPLICATED] + VOLUME
 #
 
@@ -216,9 +264,23 @@ $ docker service update --mount-add type=volume,src=[VOLUME-NAME],dst=[CONTAINER
 
 # criacao de uma rede do tipo overlay
 $ docker network create --driver overlay [NETWORK-NAME]
+{
+    $ docker network create --driver overlay minharede
+    35k1j5xnf93mz6gj1vd7wbgq0
+
+    $ docker network ls                               
+    NETWORK ID     NAME              DRIVER    SCOPE
+    35k1j5xnf93m   minharede         overlay   swarm
+}
 
 # criar e adicionar um servico em uma determinada rede
 $ docker service create --name [SERVICE-NAME] --network [NETWORK-NAME] --replicas [QTDADE-REPLICA] [IMAGE-NAME]:[VERSION]
+{
+    $ docker service create --name webserver --publish target=80,published=80 --network minharede registry:5000/nginx
+    $ docker service ps webserver                                                                                    
+    ID             NAME          IMAGE                        NODE      DESIRED STATE   CURRENT STATE                ERROR     PORTS
+    vknx166o2n18   webserver.1   registry:5000/nginx:latest   node01    Running         Running about a minute ago             
+}
 
 # servico do tipo globa implica que esse servico sera replicato para todos os nodes do cluster
 $ docker service create --name [SERVICE-NAME] --network [NETWORK-NAME] -p 8080:80 --mode global [IMAGE-NAME]:[VERSION]
@@ -241,3 +303,104 @@ $ docker network create --driver overlay [NETWORK-NAME]
 $ docker volume create [VOLUME-NAME]
 
 $ docker service create --name [SERICE-NAME] --network [NETWORK-NAME] --mount type=volume,src=[VOLUME-NAME],dst=/[CONTAINER-DIR] -p 8080:80 --replicas [QTDATE-REPLICA] --mode replicated --hostname [HOST-NAME] --dns [DNS] --limit-memory [QTDADE-MEMORY]M --limit-cpu 0.5 --restart-condition any [IMAGE-NAME]:[VERSION]
+
+# docker + volume(nfs)
+{
+    # manager, node01 e node02
+    $ docker plugin install trajano/nfs-volume-plugin --grant-all-permissions
+
+    # manager
+    $ sudo apt install nfs-server -y -d
+    $ mkdir -p /home/cferreira/storage
+    $ echo "/home/cferreira/storage/ 192.168.122.18/24(rw)" | sudo tee -a /etc/exports
+
+    # node01 e node02
+    $ sudo apt-get install nfs-common -y
+
+    # manager
+    $ docker volume create -d trajano/nfs-volume-plugin --opt device=manager:/home/cferreira/storage --opt nfsopts=hard,proto=tcp,nfsvers=3,intr,nolock volume_nfs
+    $ docker volume inspect volume_nfs | jq
+
+    # manager
+    $ docker service create --name webserver --replicas 3 --publish 80:80 --network minharede --mount source=volume_nfs,target=/usr/share/nginx/html registry:5000/nginx
+    $ docker service ps webserver                                                                                                                                       
+        ID             NAME          IMAGE                        NODE       DESIRED STATE   CURRENT STATE                ERROR     PORTS
+        2mkzgbtt6kxk   webserver.1   registry:5000/nginx:latest   node02     Running         Running about a minute ago             
+        mv1tbddiy2to   webserver.2   registry:5000/nginx:latest   registry   Running         Running about a minute ago             
+        9tauti74rrua   webserver.3   registry:5000/nginx:latest   node01     Running         Running about a minute ago             
+}
+
+#
+# STACK
+#
+
+# manager
+# $ docker stack deploy --compose-file [FILE.YML] [SERVER_NAME]
+{
+    $ docker stack deploy --compose-file webserver.yml webserver-nginx
+
+    $ docker stack ls                                                 
+    NAME              SERVICES   ORCHESTRATOR
+    webserver-nginx   1          Swarm
+}
+
+# webserver_1.yml
+{
+    $ docker stack deploy --compose-file webserver_1.yml webserver-nginx
+
+    $ docker stack services webserver-nginx                           
+    ID             NAME                        MODE      REPLICAS   IMAGE                        PORTS
+    thoy8rendwxc   webserver-nginx_webserver   global    4/4        registry:5000/nginx:latest   *:80->80/tcp
+}
+
+# webserver_2.yml
+{
+    $ docker stack deploy --compose-file webserver_2.yml webserver-nginx
+
+    $ docker stack services webserver-nginx                           
+    ID             NAME                        MODE         REPLICAS   IMAGE                        PORTS
+    wius2mk4080x   webserver-nginx_webserver   replicated   4/4        registry:5000/nginx:latest   *:80->80/tcp
+    
+    $ docker stack ps webserver-nginx      
+    ID             NAME                          IMAGE                        NODE      DESIRED STATE   CURRENT STATE            ERROR     PORTS
+    d3nezzqm3yjp   webserver-nginx_webserver.1   registry:5000/nginx:latest   manager   Running         Running 48 seconds ago             
+    7fstfrcmgrjd   webserver-nginx_webserver.2   registry:5000/nginx:latest   manager   Running         Running 48 seconds ago             
+    xalbgj2877f5   webserver-nginx_webserver.3   registry:5000/nginx:latest   manager   Running         Running 48 seconds ago             
+    iij6lyy26cpj   webserver-nginx_webserver.4   registry:5000/nginx:latest   manager   Running         Running 48 seconds ago             
+}
+
+# label
+# webserver_3.yml
+{
+    # manager
+    $ docker node update --label-add os=debian node01
+    $ docker node update --label-add location=us-east-1 node01
+
+    $ docker node update --label-add os=ubuntu node02
+    $ docker node update --label-add location=us-west-1 node02
+    
+    $ docker stack deploy --compose-file webserver_3.yml webserver-nginx
+    $ docker stack ps webserver-nginx                                   
+    ID             NAME                          IMAGE                        NODE      DESIRED STATE   CURRENT STATE           ERROR     PORTS
+    qsc1mgjgixy5   webserver-nginx_webserver.1   registry:5000/nginx:latest   node01    Running         Running 2 seconds ago             
+    ch7vie1jwx96   webserver-nginx_webserver.2   registry:5000/nginx:latest   node01    Running         Running 2 seconds ago             
+    z5jn99ruh1kq   webserver-nginx_webserver.3   registry:5000/nginx:latest   node01    Running         Running 2 seconds ago             
+    hprwpr1es551   webserver-nginx_webserver.4   registry:5000/nginx:latest   node01    Running         Running 2 seconds ago             
+}
+
+# wordpress.yml
+{
+    $ docker stack deploy --compose-file wordpress.yml wordpress-stack
+    Creating network wordpress-stack_wp_overlay
+    Creating service wordpress-stack_wordpress
+    Creating service wordpress-stack_db
+
+    $ docker stack services wordpress-stack 
+    ID             NAME                        MODE         REPLICAS   IMAGE                            PORTS
+    rpc1ndw0j8uz   wordpress-stack_db          replicated   1/1        registry:5000/mysql:5.7          
+    oxbpzy4a6j7x   wordpress-stack_wordpress   replicated   2/2        registry:5000/wordpress:latest   *:8080->80/tcp
+
+    $ w3m http://192.168.122.18:8080
+    $ w3m http://192.168.122.19:8080
+    $ w3m http://192.168.122.20:8080
+}
