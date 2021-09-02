@@ -20,7 +20,7 @@ roteamento, etc.
 
 # Criar um Network Namespace
 #
-$ ip netns add <network namespace name>
+$ ip netns add [NAMESPACE]
 {
   # cração do network namespace "rede"
   $ sudo ip netns add rede
@@ -32,7 +32,7 @@ $ ip netns add <network namespace name>
 
 # Apagar um Network Namespace
 #
-$ ip netns delete <network namespace name>
+$ ip netns delete [NAMESPACE]
 {
   # apagando o network namespace "rede"
   #
@@ -45,7 +45,7 @@ $ ip netns delete <network namespace name>
 
 # Executar comando dentro de um Network Namespace
 #
-$ ip netns exec <network namespace name> <command>
+$ ip netns exec [NAMESPACE] [COMANDO]
 {
   $ sudo ip netns exec rede ip a
   1: lo: <LOOPBACK> mtu 65536 qdisc noop state DOWN group default qlen 1000
@@ -123,7 +123,7 @@ $ sudo ip link set dev [INTERFACE] up
 
 # Adicionara interface de rede veth-b no network namespace "rede"
 #
-$ sudo ip link set [INTERFACE] netns [NAMESPACE] 
+$ sudo ip link set [INTERFACE] netns [NAMESPACE]
 {
   # Adicionar a interface de rede "veth-b" no network namespace "rede"
   #
@@ -156,7 +156,7 @@ $ sudo ip link set [INTERFACE] netns [NAMESPACE]
 
 # Mudar o estado da interface de rede virtual - DOWN para UP
 #
-$ sudo ip netns exec [NAMESPACE] ip link set dev [INTRFACE] up
+$ sudo ip netns exec [NAMESPACE] ip link set dev [INTERFACE] up
 {
   # ativar a interface
   #
@@ -272,3 +272,145 @@ $ sudo ip netns exec netns_dustin ping www.google.com -c 1
   --- www.google.com ping statistics ---
   1 packets transmitted, 1 received, 0% packet loss, time 0ms
   rtt min/avg/max/mdev = 8.447/8.447/8.447/0.000 ms
+
+#
+# OUTRO EXEMPLO DE NETWORK NAMESPACE
+#
+# https://adil.medium.com/container-networking-under-the-hood-network-namespaces-6b2b8fe8dc2a
+#
+
+# Criação de dois network namespace
+#
+$ sudo ip netns add pc-one
+$ sudo ip netns add pc-two
+
+# Criação de duas interfaces de rede virtual
+#
+$ sudo ip link add veth-pc-one type veth peer name veth-pc-two
+
+# Adicionar a interface de rede virtua ao seu respectivo network namespace
+#
+$ sudo ip link set veth-pc-one netns pc-one
+$ sudo ip link set veth-pc-two netns pc-two
+
+$ sudo ip netns exec pc-one ip a
+
+# Mudar o status das interfaces de loopback de DOWN para UP
+#
+$ sudo ip netns exec pc-one ip link set dev lo up
+$ sudo ip netns exec pc-two ip link set dev lo up
+
+# Mudar o status das interfaces de rede de DOWN para UP
+#
+$ sudo ip netns exec pc-one ip link set dev veth-pc-one up
+$ sudo ip netns exec pc-two ip link set dev veth-pc-two up
+
+# Definir endereços IP para as respectiva interfaces de rede virtual
+#
+$ sudo ip -n pc-one addr add 10.0.0.1/24 dev veth-pc-one
+$ sudo ip -n pc-two addr add 10.0.0.2/24 dev veth-pc-two
+
+# Teste
+#
+$ sudo ip netns exec pc-one ping 10.0.0.1 -c1
+$ sudo ip netns exec pc-one ping 10.0.0.2 -c1
+
+$ sudo ip netns exec pc-two ping 10.0.0.1 -c1
+$ sudo ip netns exec pc-two ping 10.0.0.2 -c1
+
+# Tabela de roteamento
+#
+$ sudo ip netns exec pc-one ip route
+
+# Teste
+#
+$ sudo ping 10.0.0.1 -c1
+
+#
+# Virtual Bridge
+#
+
+$ sudo ip netns add one
+$ sudo ip netns add two
+$ sudo ip netns add three
+
+$ sudo ip link add veth-one-in   type veth peer name veth-one-out
+$ sudo ip link add veth-two-in   type veth peer name veth-two-out
+$ sudo ip link add veth-three-in type veth peer name veth-three-out
+
+# Associar as interfaces de rede aos respectivos network namespace
+#
+$ sudo ip link set veth-one-in   netns one
+$ sudo ip link set veth-two-in   netns two
+$ sudo ip link set veth-three-in netns three
+
+# Definir o endereço IP das respectivas interfaces de rede
+#
+$ sudo ip netns exec one   ip addr add 10.0.0.10/24 dev veth-one-in
+$ sudo ip netns exec two   ip addr add 10.0.0.20/24 dev veth-two-in
+$ sudo ip netns exec three ip addr add 10.0.0.30/24 dev veth-three-in
+
+# Criação do dispositivo vitual bridge
+#
+$ sudo ip link add name virtual-bridge type bridge
+
+# Associar as interfaces virtuais ao dispositivo virtual bridge
+#
+$ sudo ip link set veth-one-out   master virtual-bridge
+$ sudo ip link set veth-two-out   master virtual-bridge
+$ sudo ip link set veth-three-out master virtual-bridge
+
+# Habilitar todos os dispositivos virtuais
+#
+$ sudo ip link set virtual-bridge up
+
+$ sudo ip link set veth-one-out   up
+$ sudo ip link set veth-two-out   up
+$ sudo ip link set veth-three-out up
+
+$ sudo ip netns exec one ip link   set dev veth-one-in   up
+$ sudo ip netns exec two ip link   set dev veth-two-in   up
+$ sudo ip netns exec three ip link set dev veth-three-in up
+
+$ sudo ip netns exec one ip link   set dev lo up
+$ sudo ip netns exec two ip link   set dev lo up
+$ sudo ip netns exec three ip link set dev lo up
+
+# Test
+#
+$ ip netns exec one ping 10.0.0.10 -c1
+$ ip netns exec one ping 10.0.0.20 -c1
+$ ip netns exec one ping 10.0.0.30 -c1
+
+$ ping 10.0.0.10 -c1
+
+# Definir um endereço IP ao virtual bridge
+#
+$ sudo ip addr add 10.0.0.1/24 dev virtual-bridge
+
+# Test
+#
+$ sudo ping 10.0.0.10 -c1
+
+# Test com a internet
+#
+$ sudo ip netns exec three ping 8.8.8.8
+
+# Adicionar um default gateway para cada networknamespace
+#
+$ sudo ip netns exec one ip route add default via 10.0.0.1
+$ sudo ip netns exec two ip route add default via 10.0.0.1
+$ sudo ip netns exec three ip route add default via 10.0.0.1
+
+# Test
+#
+$ sudo ip netns exec three ping 8.8.8.8
+
+# NAT
+#
+$ sudo iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -j MASQUERADE
+$ sudo sysctl -w net.ipv4.ip_forward=1
+
+# Test
+#
+$ sudo ip netns exec three ping 8.8.8.8 -c1
