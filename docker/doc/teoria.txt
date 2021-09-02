@@ -1,0 +1,274 @@
+#: Title : Teoria
+#: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
+#: Description : Parte teórica do mundo Docker
+#: Options :
+
+
+#
+# Linux Network Namespace
+#
+
+Docker usa muitas tecnologias de namespace Linux para isolamento, há namespace 
+de usuário, namespace de processo, etc. Para isolamento de rede, docker usa 
+tecnologia de namespace de rede Linux, cada contêiner docker tem seu próprio 
+namespace de rede, o que significa que tem seu próprio endereço IP, tabela de 
+roteamento, etc.
+
+#
+# Virtual Ethernet (veth)
+#
+
+# Criar um Network Namespace
+#
+$ ip netns add <network namespace name>
+{
+  # cração do network namespace "rede"
+  $ sudo ip netns add rede
+
+  # exibição dos network namespace existentes
+  $ ip netns list
+    rede
+}
+
+# Apagar um Network Namespace
+#
+$ ip netns delete <network namespace name>
+{
+  # apagando o network namespace "rede"
+  #
+  $ sudo ip netns delete rede
+
+  # exibição dos network namespaces existentes
+  #
+  $ ip netns list
+}
+
+# Executar comando dentro de um Network Namespace
+#
+$ ip netns exec <network namespace name> <command>
+{
+  $ sudo ip netns exec rede ip a
+  1: lo: <LOOPBACK> mtu 65536 qdisc noop state DOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+
+  $ sudo ip netns exec rede ip link
+  1: lo: <LOOPBACK> mtu 65536 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+
+  # ativar a interface de rede loopback do network namespace
+  #
+  $ sudo ip netns exec rede ip link set dev lo up
+  $ sudo ip netns exec rede ip address list
+
+  # No exemplo abaixo, o network namespace criado anteriormente será utilizado para
+  # inicializar o servidor web presente no python3.
+  #
+  # só foi possivel visualizar a página web do servidor pois a interface de rede
+  # loopback foi ativada no comando anterior.
+  #
+  $ sudo ip netns exec rede python3 -m http.server 8080
+  $ sudo ip netns exec rede curl localhost:8080
+}
+
+# Criando duas interface de rede
+#
+# os dispositivos de rede sempre são criados aos pares.
+#
+$ sudo ip link add dev [INTERFACE-A] type veth peer name [INTERFACE-B]
+{
+  # criar as duas interfaces de rede
+  #
+  $ sudo ip link add dev veth-a type veth peer name veth-b
+
+  # Exibir as interfaces de rede
+  #
+  $ ip link      
+  1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+      link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+
+  2: enp1s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000
+      link/ether 52:54:00:23:ea:96 brd ff:ff:ff:ff:ff:ff
+
+  3: veth-b@veth-a: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+      link/ether 22:29:e6:d9:7a:b0 brd ff:ff:ff:ff:ff:ff
+
+  4: veth-a@veth-b: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+      link/ether ae:0c:94:89:f0:33 brd ff:ff:ff:ff:ff:ff  
+}
+
+# Inicializar os dipositivos de rede "veth-a" e "veth-b"
+#
+$ sudo ip link set dev [INTERFACE] up
+{
+  # Alteração do status das duas interfaces de rede virtual DOWN to UP
+  #
+  $ sudo ip link set dev veth-a up
+  $ sudo ip link set dev veth-b up
+
+  # Exibir as interfaces de rede
+  #
+  $ ip link     
+  1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+      link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+
+  2: enp1s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000
+      link/ether 52:54:00:8c:75:1e brd ff:ff:ff:ff:ff:ff
+  
+  3: veth-b@veth-a: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group default qlen 1000
+      link/ether e6:6f:a9:d0:7f:fb brd ff:ff:ff:ff:ff:ff
+  
+  4: veth-a@veth-b: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group default qlen 1000
+      link/ether 32:08:71:3d:27:2c brd ff:ff:ff:ff:ff:ff
+}
+
+# Adicionara interface de rede veth-b no network namespace "rede"
+#
+$ sudo ip link set [INTERFACE] netns [NAMESPACE] 
+{
+  # Adicionar a interface de rede "veth-b" no network namespace "rede"
+  #
+  $ sudo ip link set veth-b netns rede
+
+  # Exibir as interfaces de rede
+  #
+  $ ip link list
+  1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+      link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+
+  2: enp1s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000
+    link/ether 52:54:00:23:ea:96 brd ff:ff:ff:ff:ff:ff
+
+  4: veth-a@if3: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+      link/ether ae:0c:94:89:f0:33 brd ff:ff:ff:ff:ff:ff link-netns rede
+
+  # Como é possivel observar, a interface de rede veth-b não é mais exibida.
+  #
+  # A partir do momento em que a interface re dere virtual "veth-b" foi alocada em um
+  # network namespace, a mesma ficou no status DOWN.
+  #
+  $ sudo ip netns exec rede ip link 
+  1: lo: <LOOPBACK> mtu 65536 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+      link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+
+  3: veth-b@if4: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+      link/ether 22:29:e6:d9:7a:b0 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+}
+
+# Mudar o estado da interface de rede virtual - DOWN para UP
+#
+$ sudo ip netns exec [NAMESPACE] ip link set dev [INTRFACE] up
+{
+  # ativar a interface
+  #
+  $ sudo ip netns exec rede ip link set dev veth-b up
+
+  # exibir as informações da interface de rede virtual de um determinado network namespace.
+  #
+  $ sudo ip netns exec rede ip link list             
+  1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+      link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+
+  3: veth-b@if4: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state LOWERLAYERDOWN mode DEFAULT group default qlen 1000
+      link/ether ca:cf:51:63:53:10 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+}
+
+# Definir um endereço IP para a interface de rede virtual
+#
+$ sudo ip address add [IP_ADDRESS]/[MASK] dev [INTERFACE-A]
+$ sudo ip netns exec [NAMESPACE] ip address add [IP_ADDRESS]/[MASK] dev [INTERFACE-B]
+
+{
+  # veth-a -> 10.0.0.10
+  #
+  $ sudo ip address add 10.0.0.10/24 dev veth-a
+
+  # veth-b -> 10.0.0.11
+  #
+  $ sudo ip netns exec rede ip address add 10.0.0.11/24 dev veth-b
+
+  $ ping 10.0.0.10 -c 1
+  PING 10.0.0.10 (10.0.0.10) 56(84) bytes of data.
+  64 bytes from 10.0.0.10: icmp_seq=1 ttl=64 time=0.055 ms
+
+  --- 10.0.0.10 ping statistics ---
+  1 packets transmitted, 1 received, 0% packet loss, time 0ms
+  rtt min/avg/max/mdev = 0.055/0.055/0.055/0.000 ms
+
+  $ ping 10.0.0.11 -c 1
+  PING 10.0.0.11 (10.0.0.11) 56(84) bytes of data.
+  64 bytes from 10.0.0.11: icmp_seq=1 ttl=64 time=0.083 ms
+
+  --- 10.0.0.11 ping statistics ---
+  1 packets transmitted, 1 received, 0% packet loss, time 0ms
+  rtt min/avg/max/mdev = 0.083/0.083/0.083/0.000 ms
+
+  $ sudo ip netns exec rede ping 10.0.0.10 -c 1
+  PING 10.0.0.10 (10.0.0.10) 56(84) bytes of data.
+  64 bytes from 10.0.0.10: icmp_seq=1 ttl=64 time=0.042 ms
+
+  --- 10.0.0.10 ping statistics ---
+  1 packets transmitted, 1 received, 0% packet loss, time 0ms
+  rtt min/avg/max/mdev = 0.042/0.042/0.042/0.000 ms
+
+  $ sudo ip netns exec rede ping 10.0.0.11 -c 1
+  PING 10.0.0.11 (10.0.0.11) 56(84) bytes of data.
+
+  --- 10.0.0.11 ping statistics ---
+  1 packets transmitted, 0 received, 100% packet loss, time 0ms
+
+
+  #
+  # TESTE
+  #
+
+  # Ativar o servidor web no network namespace "host"
+  #
+  $ python3 -m http.server 8080
+
+  # Teste no network namespace "host"
+  #
+  $ curl 10.0.0.11:8080
+
+
+  # Ativar o servidor web no network namespace "rede"
+  #
+  $ sudo ip netns exec rede python3 -m http.server 8080
+
+  # Teste no network namespace "host" a partir do network namespace "rede"
+  #
+  $ sudo ip netns exec rede curl 10.0.0.10:8080
+
+}
+
+# Adicionar Rota
+#
+$ sudo ip netns exec rede ip route add default via 10.0.0.10
+$ sudo ip netns exec rede curl 192.168.1.136:8080
+
+# NAT
+#
+
+# ativando o NAT
+$ echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward
+
+# regras do firewall para NAT
+$ sudo iptables --append FORWARD --in-interface veth_dustin --out-interface enp1s0 --jump ACCEPT
+$ sudo iptables --append FORWARD --in-interface enp1s0 --out-interface veth_dustin --jump ACCEPT
+$ sudo iptables --append POSTROUTING --table nat --out-interface enp1s0 --jump MASQUERADE
+
+# teste
+$ sudo ip netns exec rede ping 8.8.8.8 -c 1
+  PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
+  64 bytes from 8.8.8.8: icmp_seq=1 ttl=115 time=9.33 ms
+
+  --- 8.8.8.8 ping statistics ---
+  1 packets transmitted, 1 received, 0% packet loss, time 0ms
+  rtt min/avg/max/mdev = 9.333/9.333/9.333/0.000 ms
+
+$ sudo ip netns exec netns_dustin ping www.google.com -c 1
+  PING www.google.com (142.251.132.36) 56(84) bytes of data.
+  64 bytes from gru14s36-in-f4.1e100.net (142.251.132.36): icmp_seq=1 ttl=115 time=8.45 ms
+
+  --- www.google.com ping statistics ---
+  1 packets transmitted, 1 received, 0% packet loss, time 0ms
+  rtt min/avg/max/mdev = 8.447/8.447/8.447/0.000 ms
