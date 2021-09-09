@@ -24,8 +24,14 @@ $ docker volume COMMAND
 #
 $ docker volume create [HOST_VOLUME_NAME] ; criar um volume local
 $ docker volume ls ; listar os volumes
-$ docker volume rm [HOST_VOLUME_NAME] ; apagar um volume
-$ docker volume rm -f [HOST_VOLUME_NAME] ; forcar a remocao do volume
+$ docker volume inspect [HOST_VOLUME_NAME] ; obter informações sobre o volume criado
+
+# Crair container com volume associado a ele
+#
+$ docker container create --name <container_name> -dit --mount source<volume_name>,target=/<folder_Name> <image_name>
+{
+    $ docker container create --name myBusyBox1 -dit --mount source=devops_volume,target=/app busybox
+}
 
 # ASSOCIAR VOLUME_NAME/CONTAINER_DIR_NAME
 #
@@ -70,7 +76,12 @@ $ docker container run -dti --mount source=[HOST_VOLUME_NAME],target=/[CONTAINER
 
 # Apagar volume
 #
-$ docker volume rm [NOME_VOLUME]
+$ docker volume rm [HOST_VOLUME_NAME] ; apagar um volume
+{
+    $ docker volume rm devops_volume
+}
+$ docker volume rm -f [HOST_VOLUME_NAME] ; forcar a remocao do volume
+$ docker volume rm prune ; apagar todos os volumes
 {
     docker volume rm volume2
 }

@@ -8,6 +8,7 @@
 #
 
 # inicalizar o cluster swarm
+#
 $ docker swarm init --advertise-addr [MANAGER-IP]
 {
     $ docker swarm init --advertise-addr 192.168.122.18
@@ -21,6 +22,7 @@ $ docker swarm init --advertise-addr [MANAGER-IP]
 }
 
 # comando utilizado para exibir o comando utilizado para adicionar manager no swarm
+#
 $ docker swarm join-token manager
 {
     $ docker swarm join-token manager
@@ -30,24 +32,30 @@ $ docker swarm join-token manager
 }
 
 # comando utilizado para exibir o comando utilizado para adicionar worker no swarm
+#
 $ docker swarm join-token worker 
 {
     $ docker swarm join --token SWMTKN-1-3e78mevx1whtgowvhy3dz362n13z7eirof2b0j0v75x6tbrmhl-92h79cow1f1lsaqmd4pxjs35x 192.168.122.18:2377
 }
 
 # comando utilizado para adicionar um nó ao cluster swarm
+#
 $ docker swarm join --token [TOKEN] [IP]:[PORTA]
 {
     docker swarm join --token SWMTKN-1-3e78mevx1whtgowvhy3dz362n13z7eirof2b0j0v75x6tbrmhl-92h79cow1f1lsaqmd4pxjs35x 192.168.122.18:2377
 }
 
-$ docker swarm leave ; comando utilizado para remover o node do cluster swarm
+# comando utilizado para remover o node do cluster swarm
+#
+$ docker swarm leave
 
 #
 # NODE
 #
 
-$ docker node ls ; listar o nodes do cluster
+# listar o nodes do cluster
+#
+$ docker node ls
 {
     $ docker node ls                                   
     ID                            HOSTNAME   STATUS    AVAILABILITY   MANAGER STATUS   ENGINE VERSION
@@ -56,14 +64,26 @@ $ docker node ls ; listar o nodes do cluster
     lapr60zg96mqk0u9sxqieqvh0     node02     Ready     Active                          20.10.8
 }
 
-$ docker node ps ; listar as tarefas que estao sendo executadas nos nodes
-$ docker node rm [NODE-NAME]; remover o host do cluster 
-$ docker node inspect [NODE-NAME] ; obter informacao sobre um determinado node do cluster swarm
-$ docker node update [NODE-NAME] ; atualizar as configuracoes do node
-$ docker node --role worker [NODE-NAME] ; torna o node um worker
-$ docker node --role manager [NODE-NAME] ; torna o node um manager
+# listar as tarefas que estao sendo executadas nos nodes
+$ docker node ps
 
-$ docker node update --availability drain [NODE-NAME] ; desativar determinado node do cluster swarm
+# remover o host do cluster 
+$ docker node rm [NODE-NAME]
+
+# obter informacao sobre um determinado node do cluster swarm
+$ docker node inspect [NODE-NAME]
+
+# atualizar as configuracoes do node
+$ docker node update [NODE-NAME]
+
+# torna o node um worker
+$ docker node --role worker [NODE-NAME]
+
+# torna o node um manager
+$ docker node --role manager [NODE-NAME]
+
+# desativar determinado node do cluster swarm
+$ docker node update --availability drain [NODE-NAME]
 {
     $ docker node ls
     ID                            HOSTNAME   STATUS    AVAILABILITY   MANAGER STATUS   ENGINE VERSION
@@ -83,7 +103,8 @@ $ docker node update --availability drain [NODE-NAME] ; desativar determinado no
     o0nwt659fjbm3fu8o0udexff6     registry   Ready     Active                          20.10.8
 }
 
-$ docker node update --availability active [NODE-NAME] ; ativar determinado node do cluster swarm
+# ativar determinado node do cluster swarm
+$ docker node update --availability active [NODE-NAME]
 {
     $ docker node ls
     ID                            HOSTNAME   STATUS    AVAILABILITY   MANAGER STATUS   ENGINE VERSION
@@ -103,9 +124,12 @@ $ docker node update --availability active [NODE-NAME] ; ativar determinado node
     o0nwt659fjbm3fu8o0udexff6     registry   Ready     Active                          20.10.8
 }
 
-$ docker node update --availability pause [NODE-NAME] ; pausar determinado node do cluster swarm
+# pausar determinado node do cluster swarm
+$ docker node update --availability pause [NODE-NAME]
 
-$ docker node promote [NODE_NAME] ; promover o host de worker para manager
+# promover o host de worker para manager
+#
+$ docker node promote [NODE_NAME]
 {
     $ docker node promote node01    
     Node node01 promoted to a manager in the swarm.
@@ -143,11 +167,13 @@ $ docker image ls
     alpine                 latest    021b3423115f   4 days ago     5.6MB
     registry:5000/alpine   latest    021b3423115f   4 days ago     5.6MB
     registry               2         1fd8e1b0bb7e   3 months ago   26.2MB
+
 $ docker push registry:5000/alpine
     Using default tag: latest
     The push refers to repository [registry:5000/alpine]
     bc276c40b172: Pushed 
     latest: digest: sha256:be9bdc0ef8e96dbc428dc189b31e2e3b05523d96d12ed627c37aa2936653258c size: 528
+
 $ curl http://registry:5000/v2/_catalog                                                                                         
     {"repositories":["alpine"]}
 
@@ -184,8 +210,8 @@ $ docker service ls
 $ docker service ps [SERVICE-NAME]
 {
     $ docker service ps webserver                               
-        ID             NAME           IMAGE                        NODE      DESIRED STATE   CURRENT STATE               ERROR     PORTS
-        sfl9f2cthd2x   webserver.1    registry:5000/nginx:latest   node01    Running         Running about an hour ago             
+    ID             NAME           IMAGE                        NODE      DESIRED STATE   CURRENT STATE               ERROR     PORTS
+    sfl9f2cthd2x   webserver.1    registry:5000/nginx:latest   node01    Running         Running about an hour ago             
 
     $ docker service ps webserver 
     ID             NAME              IMAGE                        NODE       DESIRED STATE   CURRENT STATE            ERROR     PORTS
