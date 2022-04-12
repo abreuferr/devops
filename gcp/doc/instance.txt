@@ -10,6 +10,10 @@ gcloud compute instances create instance-lab --project=gcp-lab-329615 --zone=us-
 # listar instância
 $ gcloud compute instances list
 
+# definir região/zona das VMs
+$ gcloud config set compute/region us-east1
+$ gcloud config set compute/zone us-east1-b
+
 # listar tipos de vm disponiveis
 $ gcloud compute machine-types list
 $ gcloud compute machine-types list --filter=name:f1-micro
