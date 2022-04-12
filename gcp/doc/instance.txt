@@ -25,3 +25,6 @@ $ gcloud compute instances create gcp-lab05 --machine-type=f1-micro
 
 # apagar instância
 $ gcloud compute instances delete gcp-lab05
+
+# conexão via ssh
+$ gcloud compute ssh gcp-lab07
