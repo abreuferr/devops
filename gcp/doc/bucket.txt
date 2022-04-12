@@ -1,0 +1,20 @@
+#: Title : Bucket
+#: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
+#: Description : Docuemtno sobre Bucket no GCP (Google Cloud Platform)
+#: Options :
+
+# Location
+# https://cloud.google.com/storage/docs/locations
+
+# criando um Bucket
+$ gsutil mb gs://gcp-bucket-lab01
+$ gsutil mb -l SOUTHAMERICA-EAST1 gs://gcp-bucket-lab02
+
+# copiar arquivo, local 2 remoto
+$ gsutil cp teste.txt gs://gcp-bucket-lab02
+$ gsutil ls gs://gcp-bucket-lab02 
+    gs://gcp-bucket-lab02/teste.txt
+
+# listar o tamanho dos arquivos presentes no bucket
+$ gsutil du -h gs://gcp-bucket-lab02
+    6 B          gs://gcp-bucket-lab02/teste.txt
