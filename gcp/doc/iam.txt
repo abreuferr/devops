@@ -1,0 +1,22 @@
+#: Title : IAM
+#: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
+#: Description : Documento sobre IAM
+#: Options :
+
+# ativar o autocomplete
+$ gcloud alpha interactive
+
+# visualizar projetos ativos
+$ gcloud projects list
+
+# visualizar as politicas vigentes
+#
+# policy = role + user
+#
+$ gcloud projects get-iam-policy gcp-lab-329615
+
+# adicionar uma role em um determinado usuário
+$ gcloud projects add-iam-policy-binding gcp-lab-329615 --member=user:cferreira@senhasegura.com --role=roles/logging.viewer
+
+# listar todas as regras
+$ gcloud iam roles list
