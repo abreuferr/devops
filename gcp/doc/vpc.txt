@@ -2,3 +2,48 @@
 #: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
 #: Description : Documento sobre VPC
 #: Options :
+
+#
+# Teoria - VPC
+#
+
+vpc - virtual private network
+
+VPC - uma rede não se comunica com outra rede, mesmo estando no mesmo
+projeto.
+
+cada região possui o seu range de ip pré-definido na rede VPC. quando
+a VPC é criada, é atribuído um range de endereços IP de acordo com a
+região que você escolher. ip atrelado a região.
+
+vpc automática - atribuição automática do endereçamento de IP
+
+vpc customizada - possibilidade de atribuir o endereçamento de IP de
+forma manual. existe a possibilidade de precisa criar dois VPC em 
+diferentes sub-redes na mesma região.
+
+Durante a criação de uma instância, existe a possibilidade de atribuir
+uma VPC customizada ou automática.
+
+#
+# Teoria - Firewall
+#
+
+Firewall Rules - regras de firewall de acesso a instância
+
+cada VPC possui a sua firewall
+
+na vpc default já existe uma regra que permite a comunicação entre as 
+instâncias na rede.
+
+cada VPC possui duas regras por padrão, uma que bloqueia todo o trafego
+de dados que estão entrando na VPC. outra regra que permite todo o trafego
+de dados que estão saindo da VPC.
+
+existem algumas regras criadas inicialmente para o acesso interno.
+
+por padrão
+
+- criação de regra de firewall via gcp
+gcloud compute --project=gcp-lab-329615 firewall-rules create ssh --description=regra ssh --direction=INGRESS --priority=20000 --network=vpc-lab-customizado --action=ALLOW --rules=tcp:22 --source-ranges=191.162.198.186/32
+gcloud compute --project=gcp-lab-329615 firewall-rules create icmp --description="regra icmp" --direction=INGRESS --priority=65535 --network=vpc-lab-customizado --action=ALLOW --rules=icmp --source-ranges=0.0.0.0/0
