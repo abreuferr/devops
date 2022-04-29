@@ -51,3 +51,10 @@ gcloud compute --project=gcp-lab-329615 firewall-rules create icmp --description
 uma regra de firewall pode ser associado a uma tag, por exemplo, gerencia-ssh
 que libera somente a porta 22 para o acesso. Por último, a regra de firewall
 com a tag gerencia-ssh é associada a instância.
+
+#
+# Teoria - Roteamento
+#
+
+dentro da vpc default, existe a regra de roteamento que permite com que
+instancias de uma região possa se comunicar com instâncias de outra região.
