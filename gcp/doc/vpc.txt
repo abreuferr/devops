@@ -47,3 +47,7 @@ por padrão
 - criação de regra de firewall via gcp
 gcloud compute --project=gcp-lab-329615 firewall-rules create ssh --description=regra ssh --direction=INGRESS --priority=20000 --network=vpc-lab-customizado --action=ALLOW --rules=tcp:22 --source-ranges=191.162.198.186/32
 gcloud compute --project=gcp-lab-329615 firewall-rules create icmp --description="regra icmp" --direction=INGRESS --priority=65535 --network=vpc-lab-customizado --action=ALLOW --rules=icmp --source-ranges=0.0.0.0/0
+
+uma regra de firewall pode ser associado a uma tag, por exemplo, gerencia-ssh
+que libera somente a porta 22 para o acesso. Por último, a regra de firewall
+com a tag gerencia-ssh é associada a instância.
