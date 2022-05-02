@@ -1,0 +1,11 @@
+#: Title : Cloud SQL
+#: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
+#: Description : Documento sobre SQL do Google
+#: Options :
+
+sistema de bando de dados relacional e não-relacional do Google
+
+firebase - https://firebase.google.com/products
+
+O Cloud Bigtable é a opção de armazenamento de melhor desempenho 
+para trabalhar Dados de IoT e séries temporais.
