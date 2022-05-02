@@ -58,3 +58,14 @@ com a tag gerencia-ssh é associada a instância.
 
 dentro da vpc default, existe a regra de roteamento que permite com que
 instancias de uma região possa se comunicar com instâncias de outra região.
+
+#
+# Teoria - VPC Sharing e Peering
+#
+
+VPC Sharing 
+compartilhar VPC network entre projetos da mesma organização
+
+VPC Peering 
+compartilhar VPC network entre projetos de organizações diferentes
+Permitir a comunicação com endereços de ip internos
