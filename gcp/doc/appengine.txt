@@ -1,0 +1,39 @@
+#: Title : App Engine
+#: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
+#: Description : Documento sobre App Engine do Google
+#: Options :
+
+https://cloud.google.com/appengine/docs/the-appengine-environments
+
+O ambiente padrão do App Engine tem como base instâncias de 
+contêiner em execução na infraestrutura do Google. Os contêineres 
+são pré-configurados com um dos diversos ambientes de execução 
+disponíveis.
+
+Com base no Google Compute Engine, o ambiente flexível do App Engine 
+faz o escalonamento automático do app para cima e para baixo, além de 
+equilibrar a carga.
+
+#
+# App Engine Flex
+#
+
+https://github.com/GoogleCloudPlatform/python-docs-samples
+
+# Debian
+#
+$ sudo apt install python3-venv
+
+# Teste Local
+#
+$ python3 -m venv .venv
+$ source .venv/bin/activate
+$ pip install -r requirements.txt
+$ python main.py
+http://127.0.0.1:8080
+
+# Google Cloud
+#
+$ gcloud app create
+$ gcloud app deploy
+    https://gcp-lab-329615.uc.r.appspot.com
