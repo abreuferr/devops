@@ -68,4 +68,11 @@ compartilhar VPC network entre projetos da mesma organização
 
 VPC Peering 
 compartilhar VPC network entre projetos de organizações diferentes
-Permitir a comunicação com endereços de ip internos
+Permitir a comunicação com endereços de ip internos.
+
+#
+# Teoria - Cloud hibrida
+#
+
+Cloud VPN - possibilidade de conectar a sua rede VPC com outra rede
+ou outro serviço de cloud através de uma VPN.
