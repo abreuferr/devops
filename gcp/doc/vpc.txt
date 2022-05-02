@@ -76,3 +76,12 @@ Permitir a comunicação com endereços de ip internos.
 
 Cloud VPN - possibilidade de conectar a sua rede VPC com outra rede
 ou outro serviço de cloud através de uma VPN.
+
+#
+# Teoria - Cloud DNS
+#
+
+Servidor de DNS gerenciado pelo Google
+
+Através do Cloud DNS é possível gerenciar domínios de outros provedores 
+bem como registrar novos domínios.
