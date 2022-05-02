@@ -85,3 +85,54 @@ Servidor de DNS gerenciado pelo Google
 
 Através do Cloud DNS é possível gerenciar domínios de outros provedores 
 bem como registrar novos domínios.
+
+#
+# Teoria - Load Balance
+#
+
+Global Load Balance - quando o backend é distribuído em múltiplas regiões
+através de um único endereço de IP.
+
+Regional Load Balance - quando o backend é distribuído em uma única região.
+
+TCP, UDP e HTTP/HTTPS
+
+1 - template de uma instância- criar um template de uma instância
+    firewall - liberar o acesso HTTP e HTTPS
+    colocar a chave ssh no template da instância
+    script de automação
+        #!/bin/bash
+        apt update
+        apt -y install apache2
+        echo "<html><h1>LAB-LB</h1></html>" > /var/www/html/index.html
+
+2 - grupo de instância- criar um grupo de instância
+    New managed instance group (stateless) - utilizar grupo gerenciado (stateless)
+    Instance template - definir como "instance template" o template que foi criado anteriormente
+    Minimum number of instances - 2
+    Maximum number of instances - 3
+
+3 - grupo de instância - editar o grupo de instância
+    Port mapping - http/80
+
+4 - firewall - criar uma regra de firewall para o health check
+    # documentação do Google - https://cloud.google.com/load-balancing/docs/health-check-concepts
+    # o objetivo do health check é o de verificar se a instância esta ativa ou não
+    Target - All instances in the network
+    Source IPv4 ranges - 35.191.0.0/16 e 130.211.0.0/22
+    Specified protocols and ports - tcp - 80
+
+5 - fixar o endereço IP de cada instância
+    VPC > IP addresses > Reserve a static address
+    Type - Global
+    comando gcloud - gcloud compute addresses create lb-static-ip --project=gcp-lab-329615 --global
+
+6 - criar o load balance
+    Network services > Create a load balancer > HTTP(S) Load Balancing
+    Backend configuration > Create backend service
+    deixar o default
+    Backends > New backend
+        Instance group - instance-group-lab
+    Health Check - create Health Check
+    Frontend configuration
+        IP address - lb-static-ip
