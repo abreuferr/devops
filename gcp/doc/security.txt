@@ -1,0 +1,11 @@
+#: Title : Security
+#: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
+#: Description : Documento sobre Security do Google
+#: Options :
+
+https://cloud.google.com/security-command-center/docs
+
+Cloud Armor - proteção do DDOS
+Web Security Scanner - aplicações web questão de vulnerabilidade
+Event Threat Detection - logs - https://cloud.google.com/security-command-center/docs/concepts-event-threat-detection-overview
+Cloud KMS/HMS - gerenciamento das chaves de criptografia
