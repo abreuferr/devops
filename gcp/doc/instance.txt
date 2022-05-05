@@ -28,3 +28,24 @@ $ gcloud compute instances delete gcp-lab05
 
 # conexão via ssh
 $ gcloud compute ssh gcp-lab07
+
+# definir região e zona padrão
+gcloud config set compute/region us-east1
+gcloud config set compute/zone us-east1-b
+
+# listar instancia
+gcloud compute instances list
+
+# criar instancia
+gcloud compute instances create gcp-lab01
+gcloud compute instances create gcp-lab01 --machine-type=f1-micro
+
+# apagar instancia
+gcloud compute instances delete gcp-lab01
+
+# listar tipos de instancia
+gcloud compute machine-types list
+gcloud compute machine-types list --filter="name:f1-micro"
+
+# acessar a instância via ssh
+gcloud compute ssh gcp-lab01

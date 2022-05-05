@@ -18,3 +18,31 @@ $ gsutil ls gs://gcp-bucket-lab02
 # listar o tamanho dos arquivos presentes no bucket
 $ gsutil du -h gs://gcp-bucket-lab02
     6 B          gs://gcp-bucket-lab02/teste.txt
+
+# criar um bucket
+gsutil mb gs://bucket-gcp-lab01
+
+# criar um bucket e definir a região
+gsutil mb -l SOUTHAMERICA-EAST1 gs://bucket-gcp-lab01
+
+# listar o conteudo do bucket
+gsutil ls gs://bucket-gcp-lab01
+gsutil ls -la gs://bucket-gcp-lab01
+
+# apagar o conteudo do bucket
+gsutil rm gs://bucket-gcp-lab01/*
+
+# apagar o conteudo do bucket e o bucket propriamente dito
+gsutil rm -r gs://bucket-gcp-lab01
+
+# copiar um arquivo para o bucket
+gsutil cp Documents/teste.txt gs://bucket-gcp-lab01
+
+# copiar um arquivo do bucket
+gsutil cp gs://bucket-gcp-lab01/teste.txt .
+
+# exibir o tamanho dos arquivos que estão no bucket
+gsutil du -h gs://bucket-gcp-lab01
+
+# ativar versionamento no bucket
+gsutil versioning set on gs://bucket-gcp-lab01
