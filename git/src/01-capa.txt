@@ -1,0 +1,7 @@
+capa do trabalho
+
+Esse arquivo contem informacoes sobre a capa do livro.
+
+Titulo do Livro : Livro sobre Git
+Autor do livro : caio abreu ferreira
+Editora : Comics

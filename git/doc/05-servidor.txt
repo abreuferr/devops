@@ -1,0 +1,85 @@
+#: Title : git - servidor
+#: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
+#: Description : servidor do Git
+#: Options :	None
+#: Reference :	
+
+#
+# SERVIDOR REMOTO (GITHUB)
+#
+
+# visualizar os servidores remotos
+#
+$ git remote -v
+	origin	https://github.com/abreuferr/git.git (fetch)
+	origin	https://github.com/abreuferr/git.git (push)
+
+# Fazer o clone/download do PROJETO do servidor REMOTO (GitHub)
+#
+$ git clone https://github.com/abreuferr/howto.git
+
+# adicionar um repositorio remoto.
+#
+# git remote add [NOME_CURTO] [URL]
+#
+# utilizando a opcao de [NOME_CURTO], nao sera necessario utilizar a URL, basta
+# utilizar o NOME_CURTO, que no exemplo abaixo se chama ORIGIN.
+#
+$ git remote add origin https://github.com/abreuferr/MeuProjeto.git
+
+# o comando FETCH permite fazer o download somente dos arquivos que ainda nao
+# existem no repositorio local. (REMOTO -> LOCAL)
+#
+# git fetch [NOME_CURTO]
+#
+$ git fetch origin
+
+# o comando PUSH ira enviar os arquivo do repositorio local para o repositorio
+# remoto (LOCAL -> REMOTO)
+#
+# git push [NOME_CURTO] [BRANCH]
+#
+$ git push origin master
+
+# O comando PULL ira sincronizar o projeto que esta localizado no servidor remoto
+# com o servidor local.
+#
+# o objetivo deste comando eh o sincronizar as alteracoes que foram
+# feitas no servidor remoto com o servidor local e em seguida executar o merge
+# entre as versoes dos arquivos.
+#
+$ git pull origin master ; Obter todas as alterações do HEAD para o repositório local
+
+#
+# SERVER
+#
+
+# criar um servidor git particular 
+
+# local
+#
+$ mkdir ~/myProject
+$ cd ~/myProject
+$ git init
+$ echo "Projeto" > README.md
+$ git add .
+$ git commit
+
+# server
+#
+$ ssh cosmo@gitserver.local
+$ mkdir gitServer
+$ cd gitServer
+$ mkdir myProject
+$ git init --bare
+$ logout
+
+# local
+#
+$ git remote add origin cosmo@gitserver.local:gitServer/myProject
+$ git push --set-upstream origin master
+
+# local
+#
+$ rm -rf myProject
+$ git clone cosmo@gitserver.local:gitServer/myProject

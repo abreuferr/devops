@@ -1,0 +1,97 @@
+#: Title : git - configuracao
+#: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
+#: Description : Configuracao do git
+#: Options :	None
+#: Reference :	
+
+#
+# CONFIGRACAO
+#
+
+# Versao do Git
+#
+$ git --version
+
+# configuracao global do perfil do usuario no git
+#
+# se por acaso for um parametro local, basta alterar o parametro
+# --global pelo parametro --local
+#
+# Os paramentros sao salvos no arquivo  ~/.gitconfig
+#
+$ git config --global user.name "caio ferreria" ; nome do usuario
+$ git config --global user.email "abreuferr@gmail.com"  ; e-mail do usuario
+$ git config --global color.ui true ; ativar cor
+$ git config --global color.ui auto ; coloracao automatica da linha de comandos
+$ git config --global core.excludesfile ~/.gitignore    ; arquivos a serem ignorados
+$ git config --global help.autocorrect 1    ; let git automatically correct typos such as "comit" and "pussh."
+$ git config --global core.editor vim ; editor utilizado para exibir mensagens durante uma acao de commit
+$ git config --global diff.tool vimdiff ; aplicativo utilizado para visualizar as diferencas dos arquivos
+
+# Arquivo de configuracao
+#
+$ <repo>/.git/config ; Arquivo de configuração específico do repositório [--local]:
+$ ~/.gitconfig ; Arquivo de configuração específico do usuário [--global]:
+$ /etc/gitconfig ; Arquivo de configuração de todo o sistema [--system]:
+
+# Visualizar as configuracoes
+#
+$ git config --list ; configuracao atual
+$ git config --local --list ; mostra a configuracao local
+$ git config --global --list ; configuracao global
+$ git config --system --list ; configuracao do sistema
+$ git config -l 
+
+# IGNORAR ARQUIVO
+#
+# existe a possibilidade de excluir arquivos que estao dentro do diretorio do
+# projeto e que por algum motivo não sera necessario fazer um versionamento,
+# como por exemplo, arquivos temporarios. Para isso, basta adicionar os arquivos
+# desejados no arquivo .gitignore
+#
+$ cat ~/.gitignore
+	*.[oa]
+	*~
+	*.swp
+	*.swo
+
+# CONFIGURAR A CHAVE SSH PARA O ACESSO AO SERVIDOR GIT
+#
+# criar as chaves de criptografia
+#
+$ ssh-keygen -t rsa -b 4096 -C "abreuferr@gmail.com"
+
+# adicionar a chave ao ssh-agent
+#
+$ eval "$(ssh-agent -s)"
+$ ssh-add ~/.ssh/id_rsa
+
+# adicionar as chaves no Github
+#
+$ sudo apt-get install xclip
+$ xclip -sel clip < ~/.ssh/id_rsa.pub
+
+# a partir deste ponto, eh necessario acessar o site do GitHub e 
+# importar a chave de criptografia ssh.
+
+# testar a conexao
+#
+$ ssh -T git@github.com
+
+# ETOKEN
+#
+# Utilização de eToken, que contem as chaves pública/privada, armazenadas.
+#
+# a chave pública deve ser cadastrada previamento no GitHub.
+
+# ssh_config
+#
+# arquivo localizado no cliente
+#
+$ cat /etc/ssh/ssh_config
+	PKCS11Provider /usr/lib/libeToken.so
+	#Host *
+
+# comando utilizado para clonar o projeto utilizando eToken.
+#
+$ ssh-agent bash -c 'ssh-add /usr/lib/libeToken.so; git clone git@github.com:USUARIO/PROJETO.git'

@@ -1,0 +1,62 @@
+#: Title : git - inicio
+#: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
+#: Description : Inicio de um projeto no git
+#: Options :	None
+#: Reference :	
+
+# Inicializando um repositorio git
+#
+# sera criado um diretorio de nome .git dentro do diretorio de trabalho que
+# sera utilizado pela ferramenta Git para fazer todo o versionamento
+#
+$ mkdir meuprojeto
+$ cd meuprojeto
+$ git init
+
+# Clonando um repositorio git
+#
+# outra possiblidade de trabalhar com o git eh atraves do clone de um projeto.
+#
+$ git clone https://remote.com/repo.git
+$ git clone ssh://git@remote.com:/repo.git
+
+# para o inicio do projeto, serao criados alguns arquivos
+#
+$ touch src/01-capa.txt
+$ touch src/02-corpo.txt
+$ touch src/03-conclusao.txt
+$ touch src/04-referencia.txt
+
+# visualizar o status dos arquivos do projeto
+#
+$ git status	, versao completa
+$ git status -s	, versao resumida
+
+On branch master
+Your branch is up to date with 'origin/master'.
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	src/01-capa.txt
+	src/02-corpo.txt
+	src/03-conclusao.txt
+	src/04-referencia.txt
+
+LOG
+# visualizar o log ou historico do projeto
+#
+$ git log		; visualizacao padrao do log
+$ git log --graph	; visualizar o arquivo de log em formato grafo
+$ git show		; visualiza alteracoes realizadas no ultimo commit
+$ git log -p <file>	; visualizar alteracoes que ocorreram em um arquivo
+$ git log -p -2		; visualizar somente as duas ultimas alteracoes
+$ git log --stat	; visualizar algumas estatisticas
+$ git log --all		; visualizar todas as informacoes
+$ git log --before <date>	; antes de de uma determinada data
+$ git log --after <date>	; depois de uma determinada data
+$ git log --after <date> --before <date>	; range de datas
+
+$ git log --graph --decorate ; visualizar o log de uma forma mais amigavel
+$ git log --graph --pretty=oneline --abbrev-commit 
+$ git log --graph --pretty=short --abbrev-commit --since=April
+$ git log --graph --pretty=fuller --abbrev-commit --since=April --author="Caio Ferreira"

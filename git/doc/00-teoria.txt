@@ -1,0 +1,20 @@
+#: Title : git - teoria
+#: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
+#: Description : Teoria sobre o software Git
+#: Options :	None
+#: Reference :	
+
+TEORIA
+
+- remoto
+[remote repository] - servidor remoto a onde ficam armazenadas informações. Pode ser
+o Github ou o Gitlab.
+
+- remoto > local
+comando git clone - clonar um repositório remoto em um repositório local.
+
+- local > remoto
+comando git push - enviar as alterações do repositório local para um repositório remoto.
+
+- local
+[working directory]-(git add)->[staging area]-(git commit)->[local repository]-(git push)->[remote repository]

@@ -1,0 +1,128 @@
+#: Title : git - branch
+#: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
+#: Description : Branch em um projeto no git
+#: Options :	None
+#: Reference :	
+
+#
+# BRANCH
+#
+
+# O branch consiste em uma ramificacao da arvore principal do repositorio.
+# o branch eh utilizado para criar uma ramificacao na arvore principal cujo
+# objetivo eh o de permitir a criacao de uma espécide de fork de arquivo(s)
+# do projeto ou de todo o projeto.
+#
+# a principal funcao do branch eh a de permitir que seja feito alteracoes no
+# projeto sem que seja feito essa alteracoes no ramo principal de desenvolvimento.
+#
+# o arquivo pode ser alterado tanto no banch MASTER quanto no novo branch.
+# para que as alteracoes sejam unidas em um unico arquivo, sera utiliza
+# a opcao de merge.
+#
+# a branch principal recebe o nome de MASTER. Ja as outras branch podem ser nomeadas
+# pelo usuario.
+
+# comando utilizado para criar o branch
+#
+$ git branch <NOME_BRANCH>
+
+# comando utilizado para visualizar os branchs e em qual branch se encontra (*)
+#
+$ git branch			; visualizacao normal do resultado
+$ git branch -a --color		; visualiza o resultado de forma colorida
+
+# comando utilizado para renomear uma branch
+#
+$ git branch -m <NOME_ATUAL> <NOVO_NOME>	; renomear a branch
+$ git branch -M <NOME_ATUAL> <NOVO_NOME>	; forcar a renomeacao a branch
+
+# visualizar o ultimo commit em cada branch
+#
+$ git branch -v				; visualizacao de forma resumida
+$ git branch -v --no-abbrev		; visualizacao de forma extendida
+$ git branch -v --contains <BRANCH>	; mais informacoes sobre uma branch
+
+# comando utilizado para acessar uma branch
+#
+$ git checkout <NOME_BRANCH>
+
+# comando utilizado para criar uma branch e acessar a branch que acabou de ser
+# criada
+#
+$ git checkout -b <NOME_BRANCH>
+
+# comando utilizado para apagar a branch
+#
+$ git branch -d <NOME_BRANCH>					; apagando uma branch
+$ git branch -d <NOME_BRANCH1> <NOME_BRANCH2> <NOME_BRANCH3>	; varias branch
+$ git branch -D <ramo> ; Forçar a exclusão de um ramo local
+
+# renomear a branch
+#
+$ git branch -m <nome_do_novo_ramo> ; Renomear o ramo atual para um novo nome de ramo
+
+#
+# MERGE
+#
+
+# depois de executar todas as alteracoes nos arquivos nos diversos branchs,
+# realizar o "git add" e o "git commit", sera necessario unir todos o BRANCH no 
+# branch MASTER.
+#
+$ git checkout master
+	Switched to branch 'master'
+$ git merge <NOME_BRANCH>
+$ git merge -X ours <branch>	,Faz merge da <branch> especificada com a master,
+				força modificações da master para o caso de ter
+				erros na branch
+
+# depois de executar o MERGE, eh possivel remover as branch existentes
+# para isso basta executar o comando BRANCH com o parametro -d
+#
+$ git branch -d <NOME_BRANCH>	, remove uma branch de cada vez
+$ git branch | grep -v "master" | xargs git branch -D	, remove todas as branch de uma unica vez
+
+# visualizar quais as branch que foram "merged" e quais nao foram
+#
+$ git branch --merged
+$ git branch --no-merged
+
+#
+# REBASING
+#
+
+# alem da utilizacao do comando MERGE, existe outra forma de unir os varios
+# branchs no banch MASTER. Essa outra forma eh atraves do comando REBASE
+# Para isso, deve-se
+#
+# 1 - acessar a branch onde foram alterados os arquivos
+# 2 - executar o comando "git rebase master"
+#
+$ git rebase master
+
+#
+# PUSH
+#
+
+# o comando PUSH eh utilizado para enviar os dados do repositorio local
+# para o servidor Git remoto.
+
+# comando utilizado para enviar os dados
+#
+$ git push origin <NOME_BRANCH>
+
+# renomear a branch remota
+#
+$ git push origin <BRANCH_ANTIGA> <BRANCH_NOVA>
+
+
+#
+# Resumo
+#
+
+$ git checkout -b 20210331
+$ git add .
+$ git commit -am "comentario""
+$ git checkout master
+$ git merge 20210331

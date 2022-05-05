@@ -1,0 +1,101 @@
+#: Title : git - comandos
+#: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
+#: Description : Comandos do Git
+#: Options :	None
+#: Reference :	
+
+#
+# TAG
+#
+
+# Existe a possibilidade de colocar tags em pontos especificos no historico do
+# versionamento. tags podem ser utilizadas para versionar o software, v1.0/v 1.1)
+
+# visualizar as tags existentes
+#
+$ git tag
+
+# procurar por determinadas tags
+#
+$ git tag -l 'v1.*'
+
+# adicionando tag com comentario
+#
+$ git tag -a v1.0 -m 'versao 1.0'
+
+#
+# Adicionar ARQUIVO
+#
+
+# adicionar arquivoi(s) ao staging area.
+# a partir deste ponto, os arquivos adicionados serão monitorados pelo Git.
+#
+$ git add <arquivo>	, adiciona somente um arquivo ao repositorio
+$ git add *.txt		, adiciona todos os arquivos TXT ao repositorio
+$ git add --all		, adiciona todos os arquivos ao repositorio
+$ git add doc/*.txt	, adicionar todos os arquivos TXT localizados no diretorio doc
+
+#
+# REMOVER ARQUIVO
+#
+
+# existe a possibilidade de remover um arquivo previamente gerenciado pelo Git.
+#
+$ rm <ARQUIVO>		; remover o arquivo do computador
+$ git rm <ARQUIVO>	; remover o arquivo do Git
+
+#
+# MOVER ARQUIVO
+#
+
+# existe a possibilidade de mover ou renomear um arquivo previamente gerenciado
+# pelo Git.
+#
+$ mv <ARQUIVO1>	<ARQUIVO2>	; remover o arquivo do computador
+$ git mv <ARQUIVO1> <ARQUIVO2>	; remover o arquivo do Git
+
+#
+# COMMIT
+#
+
+# a funcao do comando COMMIT eh o de transferir o arquivo que acabou de ser
+# alterado para a area de versionamento. A partir deste ponto, o arquivo fica
+# armazenado no repositorio.
+#
+# depois de executar o comando "git add ..." eh necessario
+# executar o comando "git commit" para adicionar um comentario
+# em relacao a acao tomada que foi a de adicionar um arquivo.
+#
+# o comando COMMIT tambem serve para inserir um comentario e identificando
+# o que foi feito no arquivo.
+#
+$ git commit -m "Adicionar o comentario"	;	adiciona um comentario a alteracao
+$ git commit --allow-empty-message -m   ; adicionar um commit com mensagem em branco
+
+COMMIT + ADD
+# o comando abaixo equivale aos comandos
+# git add ... + git commit ...
+# o comando abaixo nao funciona para novos arquivos
+#
+$ git commit -am "Comentario"
+
+UNDO
+# Refazer o ultimo comentario do commit
+#
+$ git commit --amend -m "msg"	; altera o comentário do último commit
+
+# Remover um arquivo que foi adicionado erroneamente.
+#
+# por exemplo, foram alteados dois aquivos, foi executado o comando "git add *"
+# mas foi detectado que eh necessario adicionar um comentario para cada arquivo
+# adicionado.
+#
+$ git reset HEAD <ARQUIVO>
+$ git reset --hard HEAD ; Descartar todas as mudanças locais em seu diretório de trabalho
+$ git reset HEAD ; Tirar todos os arquivos da área de preparação (ou seja, desfazer o último git add)
+$ git revert <commit> ; Reverter um commit (produzindo um novo commit com alterações contrárias)
+$ git checkout HEAD <arquivo> ; Descartar as alterações locais em um arquivo específico
+
+# reverter a ultima alteracao/commit aplicado sobre um arquivo
+#
+$git checkout -- <ARQUIVO>

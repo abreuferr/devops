@@ -1,0 +1,96 @@
+#: Title : gitflow
+#: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
+#: Description : fluxo de desenvolvimento com a ferramenta gitflow
+#: Options : 
+#: Reference :
+
+#
+# Geral
+#
+
+# Branch "main" e "develop" são continuas
+# Branch "feature", "bugfix", "realease", "hotfix" e "support" são branchs temporárias.
+
+# imagem do fluxo
+# https://miro.medium.com/max/1400/1*8-zDz1s5Atux_yNW_mXmfg@2x.png
+
+# 
+# Inicializar projeto
+#
+
+# Diretório de trabalho
+#
+$ mkdir gitflow
+$ cd gitflow
+
+# Iniciando o projeto
+#
+$ git init
+$ git flow init
+
+# visualizar branch
+#
+$ git branch
+
+#
+# Branch feature/soma
+#
+
+# dentro da branch "feature", será criado uma branch de nome "soma" que consiste
+# na adição da funcionalidade de soma no projeto de uma calculadora.
+#
+$ git flow feature start soma                                                                                  1 ↵
+
+# Adicionar o arquivo "soma.py" que contem a nova funcionalidade
+# da calculadora.
+#
+$ touch soma.py
+
+# Foi adicionado o arquivo "soma.py" ao git
+#
+$ git add .
+
+# Commit ao código
+#
+$ git commit -m "adiciona funcionalidade de soma na calculadora" 
+
+# Finalizando a branch "soma". 
+# Depois de finalizada a branch "feature/soma", o git irá voltar 
+# para a branch "develop" e irá apagar a branch "feature/soma".
+#
+$ git flow feature finish soma
+
+#
+# Release (homologação - I/CD - QA)
+#
+
+# Inicializando a branch "release/0.1.0"
+#
+$ git flow release start 0.1.0
+
+# Finalizando a branch "release/0.1.0"
+#
+$ git flow release finish 0.1.0
+
+# :wq para sair do vim
+
+#
+# Hotfix
+#
+
+# Inicializando a branch "hotfix-soma" para concertar
+# um problema no código referente a soma
+#
+$ git flow hotfix start hotfix-soma
+
+# Arrumando o problema
+#
+$ vi soma.py
+$ git add .
+$ git commint -m "problema com a funcao soma"
+
+# Finalizando o hotfix
+#
+$ git flow hotfix start hotfix-soma
+
+# :wq para sair do vim
