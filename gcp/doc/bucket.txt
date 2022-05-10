@@ -3,6 +3,35 @@
 #: Description : Docuemtno sobre Bucket no GCP (Google Cloud Platform)
 #: Options :
 
+#
+# CLASSES DE ARMAZENAMENTO
+#
+
+# https://cloud.google.com/storage/docs/storage-classes
+
+Classe de armazenamento Nome para APIs e gsutil Duração de armazenamento mínima
+Standard Storage        STANDARD                Nenhum	
+Nearline Storage        NEARLINE                30 dias	
+Coldline Storage        COLDLINE                90 dias	
+Archive Storage         ARCHIVE                 365 dias	
+
+# Standard Storage
+#   - ideal para dados que são frequentemente acessados
+#   - pode ser armazenado em uma ou mais regiões, birregional ou multirregional
+
+# Nearline Storage
+#   - armazenamento altamente durável e de baixo custo para armazenar dados acessados com pouca frequência.
+#   - viável ter menos custos com armazenamento em repouso, e ter uma disponibilidade ligeiramente inferior
+#   - uma duração mínima de armazenamento de 30 dias e custos de acesso a dados.
+#   - adequado para backup de dados
+
+# Coldline Storage
+#   - serviço de armazenamento altamente durável e de baixo custo para armazenar dados acessados com pouca frequência.
+#   - pretende ler ou modificar no máximo uma vez por trimestre
+
+# Archive Storage
+#   - melhor opção para dados que você planeja acessar menos de uma vez por ano.
+
 # Location
 # https://cloud.google.com/storage/docs/locations
 
