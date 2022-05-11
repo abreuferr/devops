@@ -2,3 +2,63 @@
 #: Author : "Caio Abreu Ferreira" <abreuferr_gmail.com>
 #: Description : Documento sobre Google Cloud SDK, CLI
 #: Options :
+
+#
+# Documentação
+#
+
+https://cloud.google.com/sdk/docs
+
+https://cloud.google.com/sdk/docs/cheatsheet
+
+# 
+# Folha de referências
+#
+
+gcloud init: inicializar, autorizar e configurar a CLI da gcloud.
+gcloud version: exiba a versão e os componentes instalados.
+gcloud components install: instale componentes específicos.
+gcloud components update: atualize a CLI da gcloud para a versão mais recente.
+gcloud config set project: defina um projeto padrão do Google Cloud para trabalhar.
+gcloud info: exibe os detalhes atuais do ambiente da CLI da gcloud.
+
+A CLI da gcloud tem o prazer em ajudar.
+
+gcloud help: pesquise termos específicos nos documentos de referência da CLI gcloud.
+gcloud feedback: envie feedback para a equipe da CLI da gcloud.
+gcloud topic: material de ajuda complementar para tópicos que não são de comando, como acessibilidade, filtragem e formatação.
+
+Personalização - Personalize a CLI gcloud por conta própria. personalizar sua configuração com propriedades.
+
+gcloud config (.....)
+
+Credenciais - Conceda e revogue a autorização à CLI da gcloud.
+
+gcloud auth (.....)
+
+Projetos - Gerencie as políticas de acesso ao projeto.
+
+gcloud projects (.....)
+
+IAM - Configurar as preferências do Identity and Access Management (IAM) e as contas de serviço.
+
+gcloud iam (.....)
+
+Docker e Google Kubernetes Engine (GKE) - Gerencie aplicativos em contêineres no Kubernetes.
+
+gcloud container (.....)
+
+Máquinas virtuais e Compute Engine - Crie, execute e gerencie VMs na infraestrutura do Google Cloud.
+
+gcloud compute (.....)
+
+Sem servidor e App Engine - Crie aplicativos altamente escalonáveis em uma plataforma totalmente gerenciada e sem servidor
+
+gcloud app (.....)
+
+Diversos - Comandos que podem ser úteis
+
+gcloud kms decrypt: descriptografar texto criptografado (para um arquivo de texto simples) usando uma chave do Cloud Key Management Service.
+gcloud logging logs list: liste os registros do projeto.
+gcloud sql backups describe: exiba informações sobre um backup de instância do Cloud SQL.
+gcloud sql export sql: exporte dados de uma instância do Cloud SQL para um arquivo SQL.
