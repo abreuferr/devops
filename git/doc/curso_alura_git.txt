@@ -3,3 +3,52 @@
 #: Description : Curso Alura de Git
 #: Options : 
 
+# inicializar o repositório
+$ git init
+
+# mostrar o estado do repositório
+$ git status
+
+# adicionar um arquivo no repositório
+$ git add indes.html
+$ git add .
+
+# adicionar uma mensagem a um commit
+$ git commit -m "mensagem referente ao commit"
+
+# visualizar o histórico dos commit
+$ git log
+$ git log -p ; visualizar as alterações
+$ git log --pretty="format:%h %s"
+
+# visualizar/modificar as configurações
+$ git config --local user.name "caio ferreira"
+$ git config --local user.email "abreuferr@gmail.com"
+$ git config --local user.name
+$ git config --local user.email
+
+# criar repositório git
+$ git init --bare
+
+# adicionar um repositório git
+# git remote add <local> {caminho}
+$ git remote add <local> <C:/Users/ALURA/Documents/git-e-github/servidor>
+
+# visualizar o repositório git
+$ git remote -v
+
+# clonar um repositório
+# git clone {caminho} <projeto>
+$ git clone /c/Users/ALURA/Documents/git-e-github/servidor projeto
+
+# enviar os dados para o repositório
+# git push <local> <main>
+$ git push <local> <master>
+
+# renomear o repositório
+$ git remote rename <origin> <local>
+
+# receber os dados do repositório remote_port
+# git pull <local> <main>
+$ git pull <local> <master>
+
