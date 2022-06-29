@@ -3,6 +3,10 @@
 #: Description : Curso Alura de Git
 #: Options : 
 
+#
+# 02. iniciando os trabalhos
+#
+
 # inicializar o repositório
 $ git init
 
@@ -26,6 +30,10 @@ $ git config --local user.name "caio ferreira"
 $ git config --local user.email "abreuferr@gmail.com"
 $ git config --local user.name
 $ git config --local user.email
+
+#
+# 03.compartilhando o trabalho
+#
 
 # criar repositório git
 $ git init --bare
@@ -52,3 +60,37 @@ $ git remote rename <origin> <local>
 # git pull <local> <main>
 $ git pull <local> <master>
 
+#
+# 04.Trabalhando em equipe
+#
+
+# visualizar branch
+# https://git-school.github.io/visualizing-git
+
+# exibir branch
+$ git branch
+
+# criar uma branch
+$ git branch <titulo>
+
+# mudar para uma nova branch
+$ git checkout <titulo>
+
+# criar e mudar para a nova branch
+$ git checkout -b <titulo>
+
+# git add
+# git commit
+
+# voltando para a branch master
+$ git checkout master
+
+# unir as branch
+# O merge junta os trabalhos e gera um merge commit
+$ git checkout master
+$ git merge <titulo>
+
+# unir as branch
+# O rebase aplica os commits de outra branch na branch atual
+$ git checkout master
+$ git rebase <titulo>
