@@ -271,3 +271,20 @@ $ git blame git/src/index.html
 # 03.Estratégias de branching
 #
 #############################################
+
+# localizado na branch main
+
+$ git checkout -b dev                  
+
+$ git checkout -b feature/lista-cursos-cloud
+
+$ vi git/src/index.html
+$ git add git/src/index.html      
+$ git commit -m "cursos de cloud - EC2 e S3" 
+
+$ vi git/src/index.html
+$ git add git/src/index.html     
+$ git commit -m "cursos de cloud - Elstic e ECS"
+
+$ git checkout dev
+$ git merge feature/lista-cursos-cloud
