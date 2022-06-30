@@ -3,9 +3,11 @@
 #: Description : Curso Alura de Git
 #: Options : 
 
+#############################################
 #
 # 02. iniciando os trabalhos
 #
+#############################################
 
 # inicializar o repositório
 $ git init
@@ -31,9 +33,11 @@ $ git config --local user.email "abreuferr@gmail.com"
 $ git config --local user.name
 $ git config --local user.email
 
+#############################################
 #
 # 03.compartilhando o trabalho
 #
+#############################################
 
 # criar repositório git
 $ git init --bare
@@ -60,9 +64,11 @@ $ git remote rename <origin> <local>
 # git pull <local> <main>
 $ git pull <local> <master>
 
+#############################################
 #
 # 04.Trabalhando em equipe
 #
+#############################################
 
 # visualizar branch
 # https://git-school.github.io/visualizing-git
