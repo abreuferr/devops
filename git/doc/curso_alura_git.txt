@@ -213,6 +213,10 @@ $ git push origin v0.1.0
 # trazer as alterações de um determinado commit para uma determinada 
 # branch.
 #
+# Se uma implementação é necessária em sua branch e já foi feita em outra 
+# branch, pode fazer sentido trazer um commit específico, utilizando o git 
+# cherry-pick.
+#
 # git cherry-pick <HASH_COMMIT>
 
 $ git checkout -b novo-release
