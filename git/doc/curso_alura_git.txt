@@ -203,3 +203,31 @@ $ git tag
 $ git push origin main
 
 $ git push origin v0.1.0
+
+#############################################
+#
+# 02.Controle avançado de conflito
+#
+#############################################
+
+# trazer as alterações de um determinado commit para uma determinada 
+# branch.
+#
+# git cherry-pick <HASH_COMMIT>
+
+$ git checkout -b novo-release
+
+$ vi git/src/index.html
+$ git add git/src/index.html
+$ git commit "alterando o arquivo index.html"
+
+$ vi git/src/index.html
+$ git add git/src/index.html
+$ git commit "alterando o arquivo index.html"
+
+$ git log --oneline
+
+$ git checkout main
+
+$ git cherry-pick <HASH_COMMIT>
+$ git rebase novo-release
