@@ -255,3 +255,13 @@ $ git show <HASH_COMMIT>
 $ git revert <HASH_COMMIT>
 $ git add git/src/index.html
 $ git commit "alterando o arquivo index.html"
+
+# procurar pelo responsável por um determinado commit
+#
+# Com o git blame, nós podemos saber quem é o responsável por determinada 
+# linha ou bloco de código que nós não entendemos, e com isso sabemos com 
+# quem tirar a dúvida!
+#
+# git blame <ARQUIVO>
+
+$ git blame git/src/index.html
