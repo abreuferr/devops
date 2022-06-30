@@ -265,3 +265,9 @@ $ git commit "alterando o arquivo index.html"
 # git blame <ARQUIVO>
 
 $ git blame git/src/index.html
+
+#############################################
+#
+# 03.Estratégias de branching
+#
+#############################################
