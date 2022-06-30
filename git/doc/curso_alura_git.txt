@@ -122,3 +122,44 @@ git commit -m "alteração no titulo" ; foi feito um commit em relação a alter
 
 git checkout main ; nos movemos para a branch main
 git rebase titulo ; trazer as alterações da branch titulo para a branch main
+
+#############################################
+#
+# 05.Manipulando as versões
+#
+#############################################
+
+# reverter alterações feitas no código
+
+$ vi git/src/index.html
+$ git status
+$ git checkout -- index.html
+
+$ vi git/src/index.html
+$ git status
+$ git add git/src/index.html
+$ git reset HEAD index.html
+$ git checkout -- index.html
+
+$ vi git/src/index.html
+$ git add index.html
+$ git commit -m "alterando o arquivo index.html"
+$ git log
+$ git revert <HASH_COMMIT>
+
+# Quando precisamos pausar o desenvolvimento de alguma funcionalidade, 
+# ou correção, antes de finalizar, talvez não seja interessante realizar 
+# um commit, pois o nosso código pode não estar funcionando ainda. Nesse 
+# caso é interessante salvar o trabalho para podermos voltar a ele depois.
+#
+$ vi git/src/index.html
+$ git stash
+$ git stash list
+$ vi git/src/index.html
+$ git status
+$ git add index.html
+$ git commit -m "alterando o arquivo index.html"
+$ vi git/src/index.html
+$ git stash pop
+$ git add index.html
+$ git commit "alterando o arquivo index.html"
