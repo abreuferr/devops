@@ -191,3 +191,18 @@ $ git checkout -b novo-branch
 $ git log --oneline
 $ git diff <HASH_COMMIT>..<HASH_COMMIT>
 $ git diff 823fd9e..e5d38b4
+
+#
+# tags
+#
+
+git tag -a v0.1.0 -m "primeira versao beta da aplicação"
+
+git tag
+
+git push local v0.1.0
+
+git push origin main
+
+git push origin v0.1.0
+
