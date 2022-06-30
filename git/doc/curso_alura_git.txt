@@ -157,9 +157,9 @@ $ git stash
 $ git stash list
 $ vi git/src/index.html
 $ git status
-$ git add index.html
+$ git add git/src/index.html
 $ git commit -m "alterando o arquivo index.html"
 $ vi git/src/index.html
 $ git stash pop
-$ git add index.html
+$ git add git/src/index.html
 $ git commit "alterando o arquivo index.html"
