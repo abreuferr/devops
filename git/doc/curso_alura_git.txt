@@ -94,3 +94,25 @@ $ git merge <titulo>
 # O rebase aplica os commits de outra branch na branch atual
 $ git checkout master
 $ git rebase <titulo>
+
+#
+# SIMULAÇÃO
+#
+
+git branch ; para visualizar as branch existentes
+
+git checkout -b titulo ; foi criado a branch "titulo" e nos movemos para ela
+vi git/src/index.html ; modificação no arquivo index.html
+git add git/src/index.html ; foi adicionado o arquivo index.html no monitoramento
+git commit -m "alteração no titulo" ; foi feito um commit em relação a alteração feita anteriormente
+
+git checkout main ; nos movemos para a branch main
+git merge titulo ; trazer as alterações da branch titulo para a branch main
+
+git checkout -b lista ; foi criado a branch "lista" e nos movemos para email
+vi git/src/index.html ; modificação no arquivo index.html
+git add git/src/index.html ; foi adicionado o arquivo index.html no monitoramento
+git commit -m "alteração no titulo" ; foi feito um commit em relação a alteração feita anteriormente
+
+git checkout main ; nos movemos para a branch main
+git rebase titulo ; trazer as alterações da branch titulo para a branch main
