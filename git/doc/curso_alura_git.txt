@@ -235,3 +235,23 @@ $ git checkout main
 
 $ git cherry-pick <HASH_COMMIT>
 $ git rebase novo-release
+
+# procura de um determinado commit entre vários commits
+#
+# Encontrando o exato commit em que determinado bug foi introduzido, 
+# podemos revertê-lo ou até mesmo tentar entender o motivo daquele bug 
+# ter sido introduzido.
+#
+# git bisect
+
+$ git bisect start
+$ git bisect bad HEAD
+$ git bisect good <HASH_COMMIT>
+$ git bisect bad
+$ git bisect good <HASH_COMMIT>
+$ git bisect good ; confirmar que é esse commit o correto
+$ git bisect reset ; enserar a busca
+$ git show <HASH_COMMIT>
+$ git revert <HASH_COMMIT>
+$ git add git/src/index.html
+$ git commit "alterando o arquivo index.html"
