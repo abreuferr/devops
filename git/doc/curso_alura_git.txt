@@ -174,3 +174,20 @@ $ git commit "alterando o arquivo index.html"
 $ git log
 $ git checkout <HASH_COMMIT>
 $ git checkout -b novo-branch
+
+#############################################
+#
+# 06.Gerando entregas
+#
+#############################################
+
+# visualizar todas as alterações em um único comando.
+#
+# O sinal de subtração (-) antes da linha indica que ela não está mais 
+# presente no arquivo. Já o sinal de adição (+) mostra que é uma linha 
+# nova. Alterações são representadas por uma remoção e uma adição de 
+# linha.
+#
+$ git log --oneline
+$ git diff <HASH_COMMIT>..<HASH_COMMIT>
+$ git diff 823fd9e..e5d38b4
