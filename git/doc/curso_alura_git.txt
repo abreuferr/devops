@@ -163,3 +163,14 @@ $ vi git/src/index.html
 $ git stash pop
 $ git add git/src/index.html
 $ git commit "alterando o arquivo index.html"
+
+# Voltar para um determinado ponto do projeto.
+#
+# A descrição do comando git checkout --help, em uma tradução livre é: 
+# "Atualizar os arquivos na working tree para ficarem na versão especificada. 
+# [...]". Basicamente, podemos deixar o nosso código no estado do último 
+# commit de uma branch, de um commit específico, ou mesmo tags.
+#
+$ git log
+$ git checkout <HASH_COMMIT>
+$ git checkout -b novo-branch
