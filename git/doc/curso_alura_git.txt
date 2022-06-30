@@ -274,7 +274,7 @@ $ git blame git/src/index.html
 
 # localizado na branch main
 
-$ git checkout -b dev                  
+$ git checkout -b dev
 
 $ git checkout -b feature/lista-cursos-cloud
 
@@ -282,9 +282,17 @@ $ vi git/src/index.html
 $ git add git/src/index.html      
 $ git commit -m "cursos de cloud - EC2 e S3" 
 
+$ git checkout dev
+
+$ git checkout -b feature/lista-cursos-linux
+
 $ vi git/src/index.html
 $ git add git/src/index.html     
-$ git commit -m "cursos de cloud - Elstic e ECS"
+$ git commit -m "cursos de linux - shell script I e II"
 
 $ git checkout dev
 $ git merge feature/lista-cursos-cloud
+$ git merge feature/lista-cursos-linux
+
+$ git checkout main
+$ git merge dev
