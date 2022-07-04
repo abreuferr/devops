@@ -274,25 +274,45 @@ $ git blame git/src/index.html
 
 # localizado na branch main
 
-$ git checkout -b dev
+$ git checkout -b development
 
 $ git checkout -b feature/lista-cursos-cloud
-
 $ vi git/src/index.html
 $ git add git/src/index.html      
 $ git commit -m "cursos de cloud - EC2 e S3" 
 
-$ git checkout dev
+$ git checkout development
 
 $ git checkout -b feature/lista-cursos-linux
-
 $ vi git/src/index.html
-$ git add git/src/index.html     
+$ git add git/src/index.html
 $ git commit -m "cursos de linux - shell script I e II"
 
-$ git checkout dev
+$ git checkout development
 $ git merge feature/lista-cursos-cloud
 $ git merge feature/lista-cursos-linux
 
 $ git checkout main
-$ git merge dev
+
+$ git checkout -b hotfix/v0.1.1
+$ vi git/src/index.html
+$ git add git/src/index.html
+$ git commit -m "Removendo o nome da Alura do título"
+
+$ git checkout main
+$ git merge hotfix/v0.1.1
+$ git tag -a v0.1.1 -m "Versão com correção no título"
+
+$ git checkout development
+
+$ git merge hotfix/v0.1.1
+
+$ git checkout -b release/v0.2.0
+$ vi git/src/index.html
+$ git add index.html 
+$ git commit -m "Corrigindo bug: Cursos de Shell faltantes"
+
+$ git checkout main
+$ git merge release/v0.2.0
+
+$ git tag -a v0.2.0 -m "Novas listas adicionadas"
